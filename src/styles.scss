@@ -44,12 +44,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   /* Content uses the full width; the nav drawer overlays it instead of squeezing it.
      The toolbar menu icon already toggles the drawer open/closed. */
   mat-sidenav-content.mat-drawer-content { margin-left: 0 !important; }
-  mat-sidenav.sidenav {
-    position: fixed !important;
-    top: 0; bottom: 0; left: 0;
-    z-index: 1000;
-    box-shadow: 0 0 24px rgba(0, 0, 0, .35);
-  }
 
   /* Toolbar: let it wrap instead of clipping on narrow screens */
   mat-toolbar.mat-toolbar, mat-toolbar-row.mat-toolbar-row {
@@ -90,15 +84,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
   app-login .overlay {
     overflow-x: hidden !important;
-  }
-}
-
-/* ---- Mobile: closed drawer is fully hidden (Jul 20 #2) ---- */
-@media (max-width: 1024px) {
-  mat-sidenav.sidenav:not(.mat-drawer-opened) {
-    transform: translateX(-110%) !important;
-    visibility: hidden !important;
-    box-shadow: none !important;
   }
 }
 
