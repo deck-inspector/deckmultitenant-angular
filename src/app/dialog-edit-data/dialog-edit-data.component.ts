@@ -20,6 +20,7 @@ export class DialogEditDataComponent {
   logoFile: File | null = null;
   headerFile: File | null = null;
   footerFile: File | null = null;
+  templateFile: File | null = null;
   storedUsername: string | null = null;
   logoPreviewUrl: string | null = null;
   footerPreviewUrl: string | null = null;
@@ -27,6 +28,7 @@ export class DialogEditDataComponent {
   private _event: any;
 
   isSaving: boolean = false;
+  isUploadingTemplate: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<DialogEditDataComponent>,
@@ -88,6 +90,30 @@ export class DialogEditDataComponent {
       };
       reader.readAsDataURL(file);
       this._event = event;
+    }
+  }
+
+    onTemplateSelected(event: any) {
+    this.templateFile = event.target.files && event.target.files[0];
+  }
+
+  async uploadFinalTemplate() {
+    if (!this.templateFile) {
+      this.toast.error('Please choose a .docx template file.');
+      return;
+    }
+    this.isUploadingTemplate = true;
+    try {
+      await this.tenantsService
+        .replaceFinalTemplate(this.data.companyIdentifier, this.templateFile)
+        .toPromise();
+      this.toast.success('Final Report template updated for this tenant.');
+      this.templateFile = null;
+    } catch (error) {
+      console.error('Final template upload failed:', error);
+      this.toast.error('Failed to upload the Final Report template.');
+    } finally {
+      this.isUploadingTemplate = false;
     }
   }
 
