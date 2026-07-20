@@ -74,3 +74,21 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   .notepad-box { min-width: 0 !important; width: 96vw !important; }
 }
 
+
+/* ---- Mobile: login page fits phone screens (Jul 20) ---- */
+@media (max-width: 680px) {
+  app-login .login-container {
+    width: auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 40px 20px !important;
+    margin: 0 auto !important;
+  }
+  app-login .login-container mat-form-field {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  app-login .overlay {
+    overflow-x: hidden !important;
+  }
+}
