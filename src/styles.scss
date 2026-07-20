@@ -90,3 +90,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* redeploy 2 */
 
 .mat-drawer-backdrop.mat-drawer-shown { background-color: rgba(0, 0, 0, 0.55) !important; }
+
+/* ---- Mobile drawer: force open/closed position via CSS (animations unreliable in this build) ---- */
+@media (max-width: 1024px) {
+  mat-sidenav.sidenav.mat-drawer-opened {
+    transform: none !important;
+    visibility: visible !important;
+    box-shadow: 0 0 24px rgba(0,0,0,.35) !important;
+  }
+  mat-sidenav.sidenav:not(.mat-drawer-opened) {
+    transform: translateX(-100%) !important;
+    visibility: hidden !important;
+  }
+}
