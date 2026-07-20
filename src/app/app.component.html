@@ -2,7 +2,7 @@
   class="sidenav-container"
   *ngIf="router.url !== '/login'"
 >
-  <mat-sidenav mode="side" [(opened)]="opened" #sidenav class="sidenav">
+  <mat-sidenav [mode]="isMobile ? 'over' : 'side'" [(opened)]="opened" #sidenav class="sidenav">
     <div class="logo-container">
       <img src="../assets/img/e3_logo.jpg" alt="logo">
     </div>
