@@ -36,3 +36,41 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ===== Mobile pass (phones / small tablets) — desktop layout unchanged ===== */
+@media (max-width: 960px) {
+  html, body { overflow-x: hidden; }
+
+  /* Content uses the full width; the nav drawer overlays it instead of squeezing it.
+     The toolbar menu icon already toggles the drawer open/closed. */
+  mat-sidenav-content.mat-drawer-content { margin-left: 0 !important; }
+  mat-sidenav.sidenav {
+    position: fixed !important;
+    top: 0; bottom: 0; left: 0;
+    z-index: 1000;
+    box-shadow: 0 0 24px rgba(0, 0, 0, .35);
+  }
+
+  /* Toolbar: let it wrap instead of clipping on narrow screens */
+  mat-toolbar.mat-toolbar, mat-toolbar-row.mat-toolbar-row {
+    height: auto !important;
+    min-height: 48px;
+    flex-wrap: wrap;
+  }
+
+  /* Dashboard: fixed-width widget grid collapses to a single full-width column */
+  .dashboard { display: block !important; width: 100% !important; }
+  .dashboard .widget, .widget {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 0 14px 0 !important;
+  }
+
+  /* Wide tables/content scroll sideways inside the page instead of breaking it */
+  .router-container { padding: 8px !important; overflow-x: auto; }
+
+  .mat-mdc-dialog-surface { padding: .75rem !important; }
+  .notepad-box { min-width: 0 !important; width: 96vw !important; }
+}
+
