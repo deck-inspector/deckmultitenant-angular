@@ -123,4 +123,12 @@ export class TenantsService {
     return this.httpClient.post<any>(url, formData, this.options);
   }
 
+  replaceFinalTemplate(companyName: string, file: File): Observable<any> {
+    const url = `${environment.apiUrl}/project/replacefinalreporttemplate`;
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('companyName', companyName);
+    return this.httpClient.post<any>(url, formData, this.options);
+  }
+
 }
