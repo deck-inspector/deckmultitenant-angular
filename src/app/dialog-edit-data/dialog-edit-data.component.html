@@ -25,6 +25,14 @@
       </div>
     </div>
   </div>
+  <div class="form-field">
+    <h6>Final Report Template (.docx)</h6>
+    <input type="file" id="finalTemplateInput" (change)="onTemplateSelected($event)" accept=".docx" />
+    <button mat-button [disabled]="!templateFile || isUploadingTemplate" (click)="uploadFinalTemplate()">
+      <mat-spinner *ngIf="isUploadingTemplate" diameter="20"></mat-spinner>
+      <span *ngIf="!isUploadingTemplate">Upload Template</span>
+    </button>
+  </div>
 </div>
 
 <div mat-dialog-actions>
