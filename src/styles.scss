@@ -38,7 +38,7 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* ===== Mobile pass (phones / small tablets) — desktop layout unchanged ===== */
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   html, body { overflow-x: hidden; }
 
   /* Content uses the full width; the nav drawer overlays it instead of squeezing it.
@@ -94,7 +94,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 /* ---- Mobile: closed drawer is fully hidden (Jul 20 #2) ---- */
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   mat-sidenav.sidenav:not(.mat-drawer-opened) {
     transform: translateX(-110%) !important;
     visibility: hidden !important;
