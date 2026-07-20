@@ -92,3 +92,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     overflow-x: hidden !important;
   }
 }
+
+/* ---- Mobile: closed drawer is fully hidden (Jul 20 #2) ---- */
+@media (max-width: 960px) {
+  mat-sidenav.sidenav:not(.mat-drawer-opened) {
+    transform: translateX(-110%) !important;
+    visibility: hidden !important;
+    box-shadow: none !important;
+  }
+}
