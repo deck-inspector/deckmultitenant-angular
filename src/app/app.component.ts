@@ -11,7 +11,7 @@ import { LoginService } from './login.service';
 })
 export class AppComponent implements OnInit {
   title = 'crm-app';
-  opened: boolean = true;
+  opened: boolean = window.innerWidth > 960;
   userMenuOpen: boolean = false;
   date: Date = new Date();
   storedUsername: string | null = null;
@@ -50,6 +50,7 @@ export class AppComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.userMenuOpen = false;
+        if (window.innerWidth <= 960) { this.opened = false; }
       }
     });
   }
