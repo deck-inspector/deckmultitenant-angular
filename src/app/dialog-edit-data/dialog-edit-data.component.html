@@ -26,6 +26,18 @@
     </div>
   </div>
   <div class="form-field">
+    <h6>Contact Info (printed on reports)</h6>
+    <label for="tenantPhoneInput">Phone</label>
+    <input type="text" id="tenantPhoneInput" [(ngModel)]="phone" placeholder="e.g. 888-224-0489" />
+    <label for="tenantWebsiteInput">Website</label>
+    <input type="text" id="tenantWebsiteInput" [(ngModel)]="website" placeholder="e.g. www.yourcompany.com" />
+    <button mat-button [disabled]="isSavingContact" (click)="saveContactInfo()">
+      <mat-spinner *ngIf="isSavingContact" diameter="20"></mat-spinner>
+      <span *ngIf="!isSavingContact">Save Contact Info</span>
+    </button>
+  </div>
+
+  <div class="form-field">
     <h6>Final Report Template (.docx)</h6>
     <input type="file" id="finalTemplateInput" (change)="onTemplateSelected($event)" accept=".docx" />
     <button mat-button [disabled]="!templateFile || isUploadingTemplate" (click)="uploadFinalTemplate()">
