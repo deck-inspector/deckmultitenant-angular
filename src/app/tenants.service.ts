@@ -86,6 +86,11 @@ export class TenantsService {
     return this.httpClient.post<any>(apiUrl, { website }, this.options);
   }
 
+  updatePhone(tenantId: string, phone: any): Observable<any> {
+    const apiUrl = `${environment.apiUrl}/tenants/${tenantId}/updatephone`;
+    return this.httpClient.post<any>(apiUrl, { phone }, this.options);
+  }
+
   updateExpenses(tenantId: string, expense: any): Observable<any> {
     const apiUrl = `${environment.apiUrl}/tenants/${tenantId}/updateexpenses`;
     return this.httpClient.post<any>(apiUrl, { expense }, this.options);
