@@ -21,6 +21,9 @@ export class DialogEditDataComponent {
   headerFile: File | null = null;
   footerFile: File | null = null;
   templateFile: File | null = null;
+  phone: string = '';
+  website: string = '';
+  isSavingContact: boolean = false;
   storedUsername: string | null = null;
   logoPreviewUrl: string | null = null;
   footerPreviewUrl: string | null = null;
@@ -38,6 +41,8 @@ export class DialogEditDataComponent {
     public loginService: LoginService
   ) {
     this.data = { ...dialogData };
+    this.phone = dialogData?.phone || '';
+    this.website = dialogData?.website || '';
 
     const icons = dialogData?.icons;
     if (icons) {
@@ -95,6 +100,23 @@ export class DialogEditDataComponent {
 
     onTemplateSelected(event: any) {
     this.templateFile = event.target.files && event.target.files[0];
+  }
+
+  saveContactInfo() {
+    this.isSavingContact = true;
+    const tenantId = this.data.id;
+    this.tenantsService.updatePhone(tenantId, this.phone).subscribe({
+      next: () => {
+        this.tenantsService.updateWebsite(tenantId, this.website).subscribe({
+          next: () => {
+            this.isSavingContact = false;
+            this.toast.success('Contact info saved.');
+          },
+          error: () => { this.isSavingContact = false; this.toast.error('Phone saved, website failed.'); }
+        });
+      },
+      error: () => { this.isSavingContact = false; this.toast.error('Could not save contact info.'); }
+    });
   }
 
   async uploadFinalTemplate() {
