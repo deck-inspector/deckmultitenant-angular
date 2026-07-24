@@ -45,6 +45,15 @@
       <span *ngIf="!isUploadingTemplate">Upload Template</span>
     </button>
   </div>
+
+  <div class="form-field">
+    <h6>Proposal Document (.docx)</h6>
+    <input type="file" id="proposalTemplateInput" (change)="onProposalSelected($event)" accept=".docx" />
+    <button mat-button [disabled]="!proposalFile || isUploadingProposal" (click)="uploadProposalTemplate()">
+      <mat-spinner *ngIf="isUploadingProposal" diameter="20"></mat-spinner>
+      <span *ngIf="!isUploadingProposal">Upload Proposal</span>
+    </button>
+  </div>
 </div>
 
 <div mat-dialog-actions>

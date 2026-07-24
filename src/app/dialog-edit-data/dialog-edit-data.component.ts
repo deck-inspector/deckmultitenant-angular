@@ -21,6 +21,7 @@ export class DialogEditDataComponent {
   headerFile: File | null = null;
   footerFile: File | null = null;
   templateFile: File | null = null;
+  proposalFile: File | null = null;
   phone: string = '';
   website: string = '';
   isSavingContact: boolean = false;
@@ -32,6 +33,7 @@ export class DialogEditDataComponent {
 
   isSaving: boolean = false;
   isUploadingTemplate: boolean = false;
+  isUploadingProposal: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<DialogEditDataComponent>,
@@ -102,6 +104,10 @@ export class DialogEditDataComponent {
     this.templateFile = event.target.files && event.target.files[0];
   }
 
+  onProposalSelected(event: any) {
+    this.proposalFile = event.target.files && event.target.files[0];
+  }
+
   saveContactInfo() {
     this.isSavingContact = true;
     const tenantId = this.data.id;
@@ -136,6 +142,26 @@ export class DialogEditDataComponent {
       this.toast.error('Failed to upload the Final Report template.');
     } finally {
       this.isUploadingTemplate = false;
+    }
+  }
+
+  async uploadProposalTemplate() {
+    if (!this.proposalFile) {
+      this.toast.error('Please choose a .docx proposal file.');
+      return;
+    }
+    this.isUploadingProposal = true;
+    try {
+      await this.tenantsService
+        .replaceProposalTemplate(this.data.companyIdentifier, this.proposalFile)
+        .toPromise();
+      this.toast.success('Proposal document updated for this tenant.');
+      this.proposalFile = null;
+    } catch (error) {
+      console.error('Proposal upload failed:', error);
+      this.toast.error('Failed to upload the Proposal document.');
+    } finally {
+      this.isUploadingProposal = false;
     }
   }
 
