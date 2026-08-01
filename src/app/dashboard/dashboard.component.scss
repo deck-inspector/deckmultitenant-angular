@@ -355,3 +355,52 @@ app-calendar-component {
     }
   }
 }
+
+/* ===== Corrected Final Report - master template widget (ALL clients) ===== */
+.dashboard .widget.template-widget {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
+  cursor: default;
+
+  .template-widget-icon {
+    color: #29abe2;
+    margin-right: 1rem;
+  }
+
+  .template-upload {
+    width: 100%;
+    margin-top: 0.5rem;
+
+    .template-note {
+      font-size: 0.85rem;
+      color: #555;
+      margin: 0 0 0.6rem 0;
+    }
+
+    input[type='file'] {
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .template-chosen {
+      font-size: 0.85rem;
+      margin: 0.2rem 0;
+      font-weight: 600;
+    }
+
+    .template-btn {
+      background-color: #29abe2;
+      color: white;
+      border-radius: 8px;
+      padding: 0 1rem;
+
+      &:disabled {
+        background-color: #cfd8dc;
+        color: #78909c;
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@ import { DialogNotepadComponent } from '../dialog-notepad/dialog-notepad.compone
 import { DialogWalkthroughComponent } from '../dialog-walkthrough/dialog-walkthrough.component';
 import { HotToastService } from '@ngneat/hot-toast';
 import { LoginService } from '../login.service';
+import { TenantsService } from '../tenants.service';
 import { Router } from "@angular/router";
 
 @Component({
@@ -35,6 +36,9 @@ export class DashboardComponent implements OnInit {
   dragging: boolean = false;
   noGeo: boolean = false;
   storedUsername: string | null = null;
+  // Corrected Final Report MASTER template (used for ALL clients).
+  masterTemplateFile: File | null = null;
+  isUploadingMasterTemplate: boolean = false;
 
   /**
    * @param usersService The UsersService is injected to access client data and perform CRUD operations.
@@ -44,9 +48,10 @@ export class DashboardComponent implements OnInit {
   constructor(
     public usersService: UsersService,
     private dialog: MatDialog,
-    
+
     private toast: HotToastService,
     public loginService: LoginService,
+    private tenantsService: TenantsService,
     private router: Router
   ) {
     this.notes$ = this.usersService.notes;
@@ -65,6 +70,39 @@ export class DashboardComponent implements OnInit {
         this.events = [];
       }
     });
+  }
+
+  // ---- Corrected Final Report MASTER template (ALL clients) ----
+  onMasterTemplateSelected(event: any) {
+    const file: File | null = (event.target.files && event.target.files[0]) || null;
+    if (file && !/\.docx$/i.test(file.name)) {
+      this.toast.error('The master template must be a Word .docx file.');
+      event.target.value = '';
+      return;
+    }
+    this.masterTemplateFile = file;
+  }
+
+  async uploadMasterTemplate() {
+    if (!this.masterTemplateFile) {
+      this.toast.error('Please choose the corrected Final Report (.docx) first.');
+      return;
+    }
+    this.isUploadingMasterTemplate = true;
+    try {
+      // The backend replaces the ONE master template used for every client;
+      // the companyName field is kept only for API compatibility.
+      await this.tenantsService
+        .replaceFinalTemplate('master', this.masterTemplateFile)
+        .toPromise();
+      this.toast.success('Corrected Final Report saved - it is now the master template for ALL clients.');
+      this.masterTemplateFile = null;
+    } catch (error) {
+      console.error('Master Final template upload failed:', error);
+      this.toast.error('Upload failed - the master template was NOT changed.');
+    } finally {
+      this.isUploadingMasterTemplate = false;
+    }
   }
 
   /**

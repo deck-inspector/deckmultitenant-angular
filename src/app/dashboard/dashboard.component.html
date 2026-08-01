@@ -115,6 +115,33 @@
     </div>
     <div class="frozen-glass"></div>
   </div>
+  <!-- ===== CORRECTED FINAL REPORT - MASTER TEMPLATE (ALL clients) ===== -->
+  <div
+    class="widget news template-widget"
+    cdkDrag
+    cdkDragBoundary=".widget-container"
+    #widget
+    (cdkDragEnded)="getWidgetFinalPos($event)"
+  >
+    <div class="widget-description-container">
+      <mat-icon class="template-widget-icon">description</mat-icon>
+      <h2>Final Report Template</h2>
+    </div>
+    <div class="template-upload">
+      <p class="template-note">
+        The <b>one corrected Final Report</b> used for <b>ALL clients</b>. Only each
+        client's company name, phone, and their header/footer logos (from this admin
+        panel) change per client. Uploading here replaces it immediately for the
+        next report generated, and it is stored durably.
+      </p>
+      <input type="file" id="masterTemplateInput" accept=".docx" (change)="onMasterTemplateSelected($event)" />
+      <p class="template-chosen" *ngIf="masterTemplateFile">&#128196; {{ masterTemplateFile.name }}</p>
+      <button mat-button class="template-btn" [disabled]="!masterTemplateFile || isUploadingMasterTemplate" (click)="uploadMasterTemplate()">
+        <mat-spinner *ngIf="isUploadingMasterTemplate" diameter="20"></mat-spinner>
+        <span *ngIf="!isUploadingMasterTemplate">Replace master template (ALL clients)</span>
+      </button>
+    </div>
+  </div>
   <!-- <div
     class="widget calendar"
     cdkDrag
