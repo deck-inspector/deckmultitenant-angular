@@ -37,14 +37,9 @@
     </button>
   </div>
 
-  <div class="form-field">
-    <h6>Final Report Template (.docx)</h6>
-    <input type="file" id="finalTemplateInput" (change)="onTemplateSelected($event)" accept=".docx" />
-    <button mat-button [disabled]="!templateFile || isUploadingTemplate" (click)="uploadFinalTemplate()">
-      <mat-spinner *ngIf="isUploadingTemplate" diameter="20"></mat-spinner>
-      <span *ngIf="!isUploadingTemplate">Upload Template</span>
-    </button>
-  </div>
+  <!-- The Final Report Template is a single MASTER for ALL clients and is
+       managed from the admin Dashboard's "Final Report Template" widget -
+       not per tenant. -->
 
   <div class="form-field">
     <h6>Proposal Document (.docx)</h6>
