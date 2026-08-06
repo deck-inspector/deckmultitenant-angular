@@ -40,6 +40,16 @@ export class DashboardComponent implements OnInit {
   masterTemplateFile: File | null = null;
   isUploadingMasterTemplate: boolean = false;
 
+  // Client FORM masters (blank fillable forms for ALL clients): the Final
+  // Report Upon Completion (.docm, macros + dropdowns) and the Notice of
+  // Unsafe Conditions (.docx). One master each, branded per-client on download.
+  clientForms: { key: string; label: string; accept: string }[] = [
+    { key: 'finalcompletion', label: 'Final Report Upon Completion', accept: '.docm,.docx' },
+    { key: 'unsafeconditions', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm' },
+  ];
+  clientFormFile: { [key: string]: File | null } = {};
+  isUploadingClientForm: { [key: string]: boolean } = {};
+
   /**
    * @param usersService The UsersService is injected to access client data and perform CRUD operations.
    * @param dialog The MatDialog service is injected to open pre-styled material design dialogs.
@@ -81,6 +91,36 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.masterTemplateFile = file;
+  }
+
+  // ---- Client FORM masters (Final Upon Completion, Unsafe Conditions) ----
+  onClientFormSelected(key: string, event: any) {
+    const file: File | null = (event.target.files && event.target.files[0]) || null;
+    if (file && !/\.(docm|docx)$/i.test(file.name)) {
+      this.toast.error('The form must be a Word .docm or .docx file.');
+      event.target.value = '';
+      return;
+    }
+    this.clientFormFile[key] = file;
+  }
+
+  async uploadClientForm(key: string) {
+    const file = this.clientFormFile[key];
+    if (!file) {
+      this.toast.error('Please choose the form file first.');
+      return;
+    }
+    this.isUploadingClientForm[key] = true;
+    try {
+      await this.tenantsService.replaceClientForm(key, file).toPromise();
+      this.toast.success('Form saved - it is now available to ALL clients under Reports.');
+      this.clientFormFile[key] = null;
+    } catch (error) {
+      console.error('Client form upload failed:', error);
+      this.toast.error('Upload failed - the form was NOT changed.');
+    } finally {
+      this.isUploadingClientForm[key] = false;
+    }
   }
 
   async uploadMasterTemplate() {

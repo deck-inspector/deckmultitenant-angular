@@ -142,6 +142,35 @@
       </button>
     </div>
   </div>
+
+  <!-- Client blank FORMS (Final Upon Completion, Notice of Unsafe Conditions).
+       One master each for ALL clients; branded per-client on download and
+       offered under each client's Reports tab. -->
+  <div class="widget template-widget">
+    <div class="widget-description-container">
+      <mat-icon class="template-widget-icon">assignment</mat-icon>
+      <h2>Client Forms</h2>
+    </div>
+    <div class="template-upload">
+      <p class="template-note">
+        Blank fillable forms offered to <b>ALL clients</b> under their <b>Reports</b>
+        tab. Each client's own header/footer logos are stamped on at download. Upload
+        here to replace the master used by every client. Keep the
+        <b>Final Report Upon Completion</b> as a macro-enabled <b>.docm</b> so its
+        dropdowns and color-on-select keep working.
+      </p>
+      <div class="client-form-row" *ngFor="let f of clientForms" style="margin-bottom:14px">
+        <h6>{{ f.label }}</h6>
+        <input type="file" [id]="'clientFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
+        <p class="template-chosen" *ngIf="clientFormFile[f.key]">&#128196; {{ clientFormFile[f.key]?.name }}</p>
+        <button mat-button class="template-btn" [disabled]="!clientFormFile[f.key] || isUploadingClientForm[f.key]" (click)="uploadClientForm(f.key)">
+          <mat-spinner *ngIf="isUploadingClientForm[f.key]" diameter="20"></mat-spinner>
+          <span *ngIf="!isUploadingClientForm[f.key]">Replace for ALL clients</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- <div
     class="widget calendar"
     cdkDrag
