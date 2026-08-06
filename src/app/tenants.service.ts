@@ -144,4 +144,15 @@ export class TenantsService {
     return this.httpClient.post<any>(url, formData, this.options);
   }
 
+  // Replace a client FORM master (one master for all clients, like the Final
+  // Report). formKey identifies which form (e.g. 'finalcompletion',
+  // 'unsafeconditions').
+  replaceClientForm(formKey: string, file: File): Observable<any> {
+    const url = `${environment.apiUrl}/project/replaceclientform`;
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('formKey', formKey);
+    return this.httpClient.post<any>(url, formData, this.options);
+  }
+
 }
