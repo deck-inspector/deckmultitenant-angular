@@ -46,6 +46,11 @@ export class DashboardComponent implements OnInit {
   clientForms: { key: string; label: string; accept: string }[] = [
     { key: 'finalcompletion', label: 'Final Report Upon Completion', accept: '.docm,.docx' },
     { key: 'unsafeconditions', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm' },
+    // Generation master for the integrated Final Report on Final-Inspection
+    // projects (David, Aug 21 2026): one master for ALL clients; each client's
+    // own Multi-Tennant logo/footer and company name are inserted at
+    // generation time, and the per-location repairs annex renders inside it.
+    { key: 'finalrepairsmaster', label: 'Master Final Inspection Upon Completion of Repairs', accept: '.docx' },
   ];
   clientFormFile: { [key: string]: File | null } = {};
   isUploadingClientForm: { [key: string]: boolean } = {};
