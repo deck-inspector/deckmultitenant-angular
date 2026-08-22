@@ -2,42 +2,46 @@
 <div mat-dialog-content class="mat-dialog-content">
   <div class="icon-section">
     <div class="form-field">
-      <h6>Company Logo</h6>
+      <h6>Logo for Website Display</h6>
+      <p style="font-size:12px;margin:2px 0 4px">Shown on the web site only &mdash; not printed on reports.</p>
       <input type="file" id="logoFileInput" (change)="onFileSelected('companyLogo', $event)" accept="image/jpeg, image/jpg, image/png" />
       <div *ngIf="logoPreviewUrl" class="image-preview">
         <img [src]="logoPreviewUrl" alt="Image Preview" class="preview-image">
       </div>
+      <label>Width (px) <input type="number" [(ngModel)]="websiteW" step="1" style="width:80px" /></label>
+      <label>Height (px) <input type="number" [(ngModel)]="websiteH" step="1" style="width:80px" /></label>
+      <p style="font-size:12px;margin:2px 0 4px">Blank = automatic (site default). Set either or both.</p>
     </div>
 
     <div class="form-field">
-      <h6>Report Header</h6>
+      <h6>Report Header (company logo on reports)</h6>
       <input type="file" id="headerFileInput" (change)="onFileSelected('reportHeader', $event)" accept="image/jpeg, image/jpg, image/png" />
       <div *ngIf="headerPreviewUrl" class="image-preview">
         <img [src]="headerPreviewUrl" alt="Image Preview" class="preview-image">
       </div>
+      <label>Width (in) <input type="number" [(ngModel)]="headerW" step="0.05" style="width:80px" /></label>
+      <label>Height (in) <input type="number" [(ngModel)]="headerH" step="0.05" style="width:80px" /></label>
+      <p style="font-size:12px;margin:2px 0 4px">Standard height 0.75. Blank dimension keeps the image's shape; set both to force an exact box. No limits.</p>
     </div>
 
     <div class="form-field">
-      <h6>Report Footer</h6>
+      <h6>Report Footer (footer badge on reports)</h6>
       <input type="file" id="footerFileInput" (change)="onFileSelected('reportFooter', $event)" accept="image/jpeg, image/jpg, image/png" />
       <div *ngIf="footerPreviewUrl" class="image-preview">
         <img [src]="footerPreviewUrl" alt="Image Preview" class="preview-image">
       </div>
+      <label>Width (in) <input type="number" [(ngModel)]="footerW" step="0.05" style="width:80px" /></label>
+      <label>Height (in) <input type="number" [(ngModel)]="footerH" step="0.05" style="width:80px" /></label>
+      <p style="font-size:12px;margin:2px 0 4px">Standard height 0.5. Blank dimension keeps the image's shape. No limits.</p>
     </div>
   </div>
   <div class="form-field">
-    <h6>Report Logo Size (inches)</h6>
-    <label for="headerLogoSizeInput">Header logo height</label>
-    <input type="number" id="headerLogoSizeInput" [(ngModel)]="headerLogoIn" step="0.05" min="0.3" max="2" />
-    <label for="footerLogoSizeInput">Footer badge height</label>
-    <input type="number" id="footerLogoSizeInput" [(ngModel)]="footerLogoIn" step="0.05" min="0.25" max="1.5" />
-    <p style="font-size:12px;margin:4px 0 6px">Standard is 0.75 header / 0.5 footer. Increase the header for square or round logos that print small (e.g. 1.0&ndash;1.1). Applies to every report and form this client generates.</p>
     <button mat-button [disabled]="isSavingLogoSize" (click)="saveLogoSize()">
       <mat-spinner *ngIf="isSavingLogoSize" diameter="20"></mat-spinner>
-      <span *ngIf="!isSavingLogoSize">Save Logo Size</span>
+      <span *ngIf="!isSavingLogoSize">Save Sizes</span>
     </button>
+    <p style="font-size:12px;margin:2px 0 4px">Website size shows on the web site; header/footer sizes print on every report and form this client generates.</p>
   </div>
-
   <div class="form-field">
     <h6>Contact Info (printed on reports)</h6>
     <label for="tenantPhoneInput">Phone</label>

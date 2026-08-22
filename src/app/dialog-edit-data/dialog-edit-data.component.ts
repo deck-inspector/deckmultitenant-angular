@@ -25,9 +25,15 @@ export class DialogEditDataComponent {
   phone: string = '';
   website: string = '';
   isSavingContact: boolean = false;
-  // Report logo sizing (inches). Defaults = the classic Visual-report sizes.
-  headerLogoIn: number = 0.75;
-  footerLogoIn: number = 0.5;
+  // Per-section sizing (David, Aug 22): website logo in pixels, report
+  // header/footer in inches. Independent width and height, no limits; null =
+  // automatic.
+  websiteW: number | null = null;
+  websiteH: number | null = null;
+  headerW: number | null = null;
+  headerH: number | null = 0.75;
+  footerW: number | null = null;
+  footerH: number | null = 0.5;
   isSavingLogoSize: boolean = false;
   storedUsername: string | null = null;
   logoPreviewUrl: string | null = null;
@@ -50,9 +56,15 @@ export class DialogEditDataComponent {
     this.phone = dialogData?.phone || '';
     this.website = dialogData?.website || '';
 
-    const sizes = dialogData?.reportLogoSizes;
-    this.headerLogoIn = (sizes && Number(sizes.headerIn)) || 0.75;
-    this.footerLogoIn = (sizes && Number(sizes.footerIn)) || 0.5;
+    const legacy = dialogData?.reportLogoSizes;
+    const bs = dialogData?.brandSizes || {};
+    const pick = (v: any) => (Number(v) > 0 ? Number(v) : null);
+    this.websiteW = pick(bs.website?.w);
+    this.websiteH = pick(bs.website?.h);
+    this.headerW = pick(bs.header?.w);
+    this.headerH = pick(bs.header?.h) ?? (pick(legacy?.headerIn) ?? 0.75);
+    this.footerW = pick(bs.footer?.w);
+    this.footerH = pick(bs.footer?.h) ?? (pick(legacy?.footerIn) ?? 0.5);
 
     const icons = dialogData?.icons;
     if (icons) {
@@ -118,22 +130,22 @@ export class DialogEditDataComponent {
 
   saveLogoSize() {
     this.isSavingLogoSize = true;
-    this.tenantsService
-      .updateReportLogoSizes(this.data.id, { headerIn: Number(this.headerLogoIn), footerIn: Number(this.footerLogoIn) })
-      .subscribe({
-        next: (res: any) => {
-          this.isSavingLogoSize = false;
-          if (res && res.sizes) {
-            this.headerLogoIn = res.sizes.headerIn;
-            this.footerLogoIn = res.sizes.footerIn;
-          }
-          this.toast.success('Logo size saved - it applies to every report this client generates from now on.');
-        },
-        error: () => {
-          this.isSavingLogoSize = false;
-          this.toast.error('Could not save the logo size.');
-        },
-      });
+    const dim = (v: any) => (Number(v) > 0 ? Number(v) : null);
+    const body = {
+      website: { w: dim(this.websiteW), h: dim(this.websiteH) },
+      header: { w: dim(this.headerW), h: dim(this.headerH) },
+      footer: { w: dim(this.footerW), h: dim(this.footerH) },
+    };
+    this.tenantsService.updateReportLogoSizes(this.data.id, body).subscribe({
+      next: () => {
+        this.isSavingLogoSize = false;
+        this.toast.success('Sizes saved - website size shows immediately; report sizes apply to every new document.');
+      },
+      error: () => {
+        this.isSavingLogoSize = false;
+        this.toast.error('Could not save the sizes.');
+      },
+    });
   }
 
   saveContactInfo() {
