@@ -25,6 +25,10 @@ export class DialogEditDataComponent {
   phone: string = '';
   website: string = '';
   isSavingContact: boolean = false;
+  // Report logo sizing (inches). Defaults = the classic Visual-report sizes.
+  headerLogoIn: number = 0.75;
+  footerLogoIn: number = 0.5;
+  isSavingLogoSize: boolean = false;
   storedUsername: string | null = null;
   logoPreviewUrl: string | null = null;
   footerPreviewUrl: string | null = null;
@@ -45,6 +49,10 @@ export class DialogEditDataComponent {
     this.data = { ...dialogData };
     this.phone = dialogData?.phone || '';
     this.website = dialogData?.website || '';
+
+    const sizes = dialogData?.reportLogoSizes;
+    this.headerLogoIn = (sizes && Number(sizes.headerIn)) || 0.75;
+    this.footerLogoIn = (sizes && Number(sizes.footerIn)) || 0.5;
 
     const icons = dialogData?.icons;
     if (icons) {
@@ -106,6 +114,26 @@ export class DialogEditDataComponent {
 
   onProposalSelected(event: any) {
     this.proposalFile = event.target.files && event.target.files[0];
+  }
+
+  saveLogoSize() {
+    this.isSavingLogoSize = true;
+    this.tenantsService
+      .updateReportLogoSizes(this.data.id, { headerIn: Number(this.headerLogoIn), footerIn: Number(this.footerLogoIn) })
+      .subscribe({
+        next: (res: any) => {
+          this.isSavingLogoSize = false;
+          if (res && res.sizes) {
+            this.headerLogoIn = res.sizes.headerIn;
+            this.footerLogoIn = res.sizes.footerIn;
+          }
+          this.toast.success('Logo size saved - it applies to every report this client generates from now on.');
+        },
+        error: () => {
+          this.isSavingLogoSize = false;
+          this.toast.error('Could not save the logo size.');
+        },
+      });
   }
 
   saveContactInfo() {

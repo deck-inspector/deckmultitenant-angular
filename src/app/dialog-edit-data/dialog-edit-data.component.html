@@ -26,6 +26,19 @@
     </div>
   </div>
   <div class="form-field">
+    <h6>Report Logo Size (inches)</h6>
+    <label for="headerLogoSizeInput">Header logo height</label>
+    <input type="number" id="headerLogoSizeInput" [(ngModel)]="headerLogoIn" step="0.05" min="0.3" max="2" />
+    <label for="footerLogoSizeInput">Footer badge height</label>
+    <input type="number" id="footerLogoSizeInput" [(ngModel)]="footerLogoIn" step="0.05" min="0.25" max="1.5" />
+    <p style="font-size:12px;margin:4px 0 6px">Standard is 0.75 header / 0.5 footer. Increase the header for square or round logos that print small (e.g. 1.0&ndash;1.1). Applies to every report and form this client generates.</p>
+    <button mat-button [disabled]="isSavingLogoSize" (click)="saveLogoSize()">
+      <mat-spinner *ngIf="isSavingLogoSize" diameter="20"></mat-spinner>
+      <span *ngIf="!isSavingLogoSize">Save Logo Size</span>
+    </button>
+  </div>
+
+  <div class="form-field">
     <h6>Contact Info (printed on reports)</h6>
     <label for="tenantPhoneInput">Phone</label>
     <input type="text" id="tenantPhoneInput" [(ngModel)]="phone" placeholder="e.g. 888-224-0489" />
