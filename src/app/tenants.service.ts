@@ -66,6 +66,13 @@ export class TenantsService {
     return this.httpClient.post<any>(url, {}, this.options);
   }
 
+  // Per-tenant report logo sizing (inches) - header logo height and footer
+  // badge height printed on every report/form this client generates.
+  updateReportLogoSizes(tenantId: string, sizes: { headerIn: number; footerIn: number }): Observable<any> {
+    const url = `${environment.apiUrl}/tenants/${tenantId}/reportlogosize`;
+    return this.httpClient.post<any>(url, sizes, this.options);
+  }
+
   upsertIcons(tenantId: string, iconsData: any): Observable<any> {
     const url = `${environment.apiUrl}/tenants/${tenantId}/upserticons`;
     return this.httpClient.post<any>(url, iconsData, this.options);
