@@ -44,16 +44,19 @@ export class DashboardComponent implements OnInit {
   // Report Upon Completion (.docm, macros + dropdowns) and the Notice of
   // Unsafe Conditions (.docx). One master each, branded per-client on download.
   clientForms: { key: string; label: string; accept: string }[] = [
-    { key: 'finalcompletion', label: 'Final Report Upon Completion', accept: '.docm,.docx' },
+    { key: 'finalcompletion', label: 'Final Report Upon Visual, Owner Supplied Photos', accept: '.docm,.docx' },
     { key: 'unsafeconditions', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm' },
     // Generation master for the integrated Final Report on Final-Inspection
-    // projects (David, Aug 21 2026): one master for ALL clients; each client's
-    // own Multi-Tennant logo/footer and company name are inserted at
-    // generation time, and the per-location repairs annex renders inside it.
-    { key: 'finalrepairsmaster', label: 'Master Final Inspection Upon Completion of Repairs', accept: '.docx' },
+    // projects: one master for ALL clients; each client's own Multi-Tennant
+    // logo/footer and company name are inserted at generation time, and the
+    // per-location repairs annex renders inside it. (Names per David, Aug 22.)
+    { key: 'finalrepairsmaster', label: 'Master Final Upon Repairs, Onsite Visit', accept: '.docx' },
   ];
   clientFormFile: { [key: string]: File | null } = {};
   isUploadingClientForm: { [key: string]: boolean } = {};
+  // Last-upload info per slot (date + uploaded file name), from the backend
+  // blob metadata - shown under each slot title (David, Aug 22).
+  clientFormStatus: { [key: string]: { uploadedAt: string | null; fileName: string | null; source: string } } = {};
 
   /**
    * @param usersService The UsersService is injected to access client data and perform CRUD operations.
@@ -120,12 +123,28 @@ export class DashboardComponent implements OnInit {
       await this.tenantsService.replaceClientForm(key, file).toPromise();
       this.toast.success('Form saved - it is now available to ALL clients under Reports.');
       this.clientFormFile[key] = null;
+      this.loadClientFormStatus();
     } catch (error) {
       console.error('Client form upload failed:', error);
       this.toast.error('Upload failed - the form was NOT changed.');
     } finally {
       this.isUploadingClientForm[key] = false;
     }
+  }
+
+  // Fetch when each form master was last uploaded and what the file was
+  // called, so the widget can show it per slot.
+  loadClientFormStatus() {
+    this.tenantsService.getClientFormsStatus().subscribe({
+      next: (data: any) => {
+        const map: any = {};
+        for (const f of (data && data.forms) || []) {
+          map[f.key] = { uploadedAt: f.uploadedAt || null, fileName: f.fileName || null, source: f.source || 'none' };
+        }
+        this.clientFormStatus = map;
+      },
+      error: () => { /* status is informational - widget still works without it */ },
+    });
   }
 
   async uploadMasterTemplate() {
@@ -158,6 +177,7 @@ export class DashboardComponent implements OnInit {
     // this.getCurrentWeather();
     // this.checkTutorial();
     this.performUserLoginSteps();
+    this.loadClientFormStatus();
     const authData: any = JSON.parse(localStorage.getItem('authToken')!);
     const storedUsername = authData.name;
 

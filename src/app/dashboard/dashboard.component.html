@@ -156,15 +156,22 @@
         Blank fillable forms offered to <b>ALL clients</b> under their <b>Reports</b>
         tab. Each client's own header/footer logos are stamped on at download. Upload
         here to replace the master used by every client. Keep the
-        <b>Final Report Upon Completion</b> as a macro-enabled <b>.docm</b> so its
-        dropdowns and color-on-select keep working. The
-        <b>Master Final Inspection Upon Completion of Repairs</b> (.docx) is the
-        generation master for Final-Inspection projects &mdash; project data,
+        <b>Final Report Upon Visual, Owner Supplied Photos</b> as a macro-enabled
+        <b>.docm</b> so its dropdowns and color-on-select keep working. The
+        <b>Master Final Upon Repairs, Onsite Visit</b> (.docx) is the
+        generation master for on-site repairs inspections &mdash; project data,
         photos, PASS/FAIL and each client's own branding are inserted
         automatically when the report is created.
       </p>
       <div class="client-form-row" *ngFor="let f of clientForms" style="margin-bottom:14px">
         <h6>{{ f.label }}</h6>
+        <p class="template-note" style="margin:2px 0 6px" *ngIf="clientFormStatus[f.key] as st">
+          <ng-container *ngIf="st.source === 'uploaded'; else builtIn">
+            Last upload: <b>{{ st.uploadedAt | date : 'M/d/yyyy h:mm a' }}</b>
+            <ng-container *ngIf="st.fileName"> &mdash; {{ st.fileName }}</ng-container>
+          </ng-container>
+          <ng-template #builtIn>Built-in master (never replaced here)</ng-template>
+        </p>
         <input type="file" [id]="'clientFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
         <p class="template-chosen" *ngIf="clientFormFile[f.key]">&#128196; {{ clientFormFile[f.key]?.name }}</p>
         <button mat-button class="template-btn" [disabled]="!clientFormFile[f.key] || isUploadingClientForm[f.key]" (click)="uploadClientForm(f.key)">
