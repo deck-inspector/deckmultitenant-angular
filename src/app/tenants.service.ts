@@ -155,4 +155,11 @@ export class TenantsService {
     return this.httpClient.post<any>(url, formData, this.options);
   }
 
+  // Per-slot last-upload info for the Client Forms widget (date + original
+  // file name of the most recent upload of each master).
+  getClientFormsStatus(): Observable<any> {
+    const url = `${environment.apiUrl}/project/clientformsstatus`;
+    return this.httpClient.get<any>(url, this.options);
+  }
+
 }
