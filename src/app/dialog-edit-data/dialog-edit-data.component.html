@@ -10,6 +10,7 @@
       </div>
       <label>Width (px) <input type="number" [(ngModel)]="websiteW" step="1" style="width:80px" /></label>
       <label>Height (px) <input type="number" [(ngModel)]="websiteH" step="1" style="width:80px" /></label>
+      <p style="font-size:12px;margin:2px 0 0"><b>{{ savedLabel('website', 'px') }}</b></p>
       <p style="font-size:12px;margin:2px 0 4px">Blank = automatic (site default). Set either or both.</p>
     </div>
 
@@ -21,6 +22,7 @@
       </div>
       <label>Width (in) <input type="number" [(ngModel)]="headerW" step="0.05" style="width:80px" /></label>
       <label>Height (in) <input type="number" [(ngModel)]="headerH" step="0.05" style="width:80px" /></label>
+      <p style="font-size:12px;margin:2px 0 0"><b>{{ savedLabel('header', 'in') }}</b></p>
       <p style="font-size:12px;margin:2px 0 4px">Standard height 0.75. Blank dimension keeps the image's shape; set both to force an exact box. No limits.</p>
     </div>
 
@@ -32,6 +34,7 @@
       </div>
       <label>Width (in) <input type="number" [(ngModel)]="footerW" step="0.05" style="width:80px" /></label>
       <label>Height (in) <input type="number" [(ngModel)]="footerH" step="0.05" style="width:80px" /></label>
+      <p style="font-size:12px;margin:2px 0 0"><b>{{ savedLabel('footer', 'in') }}</b></p>
       <p style="font-size:12px;margin:2px 0 4px">Standard height 0.5. Blank dimension keeps the image's shape. No limits.</p>
     </div>
   </div>
@@ -40,7 +43,7 @@
       <mat-spinner *ngIf="isSavingLogoSize" diameter="20"></mat-spinner>
       <span *ngIf="!isSavingLogoSize">Save Sizes</span>
     </button>
-    <p style="font-size:12px;margin:2px 0 4px">Website size shows on the web site; header/footer sizes print on every report and form this client generates.</p>
+    <p style="font-size:12px;margin:2px 0 4px">Website size shows on the web site; header/footer sizes print on every report and form this client generates. <b>Ok</b> saves these sizes too.</p>
   </div>
   <div class="form-field">
     <h6>Contact Info (printed on reports)</h6>
