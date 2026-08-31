@@ -74,6 +74,8 @@ export class DashboardComponent implements OnInit {
   // blob metadata - shown under each slot title (David, Aug 22).
   clientFormStatus: { [key: string]: any } = {};
   isDownloadingMaster: { [key: string]: boolean } = {};
+  // Drag-and-drop highlight state, one flag per slot.
+  dragOverForm: { [key: string]: boolean } = {};
 
   /**
    * @param usersService The UsersService is injected to access client data and perform CRUD operations.
@@ -127,6 +129,41 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.clientFormFile[key] = file;
+  }
+
+  // ---- Drag and drop onto a Master Forms slot (David, Aug 31) ----
+  // The file chooser still works exactly as before; this just adds dropping a
+  // file straight onto the slot. dragover MUST preventDefault or the browser
+  // opens the file instead of letting the page have it.
+  onFormDragOver(key: string, event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOverForm[key] = true;
+  }
+
+  onFormDragLeave(key: string, event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOverForm[key] = false;
+  }
+
+  onFormDrop(key: string, event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOverForm[key] = false;
+    const files = event.dataTransfer && event.dataTransfer.files;
+    if (!files || !files.length) return;
+    if (files.length > 1) {
+      this.toast.error('Drop one file at a time - each slot holds a single master.');
+      return;
+    }
+    const file = files[0];
+    if (!/\.(docm|docx)$/i.test(file.name)) {
+      this.toast.error('The form must be a Word .docm or .docx file.');
+      return;
+    }
+    this.clientFormFile[key] = file;
+    this.toast.success(file.name + ' ready - press "Replace for ALL clients" to save it.');
   }
 
   // Download the current master so it can be edited and put back in the SAME

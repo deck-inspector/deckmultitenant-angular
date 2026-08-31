@@ -134,6 +134,7 @@
         details are applied when their report is created &mdash; the masters stay unbranded.
         <br><b>To edit a form:</b> download the current one, make your changes in Word, then upload
         it back into the same slot. That keeps one master per form instead of creating new ones.
+        You can drag a file straight onto a slot, or use its file chooser.
       </p>
 
       <div class="client-form-row" *ngFor="let f of masterForms" style="margin-bottom:16px">
@@ -155,7 +156,17 @@
           <mat-spinner *ngIf="isDownloadingMaster[f.key]" diameter="20"></mat-spinner>
           <span *ngIf="!isDownloadingMaster[f.key]">&#11015; Download current form</span>
         </button>
-        <input type="file" [id]="'masterFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
+        <div class="form-dropzone"
+             [class.dragging]="dragOverForm[f.key]"
+             (dragover)="onFormDragOver(f.key, $event)"
+             (dragleave)="onFormDragLeave(f.key, $event)"
+             (drop)="onFormDrop(f.key, $event)">
+          <p style="margin:0 0 6px;font-size:13px">
+            <b>{{ dragOverForm[f.key] ? 'Drop to use this file' : 'Drag &amp; drop the updated form here' }}</b>
+            <span *ngIf="!dragOverForm[f.key]"> &mdash; or choose it below</span>
+          </p>
+          <input type="file" [id]="'masterFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
+        </div>
         <p class="template-chosen" *ngIf="clientFormFile[f.key]">&#128196; {{ clientFormFile[f.key]?.name }}</p>
         <button mat-button class="template-btn" [disabled]="!clientFormFile[f.key] || isUploadingClientForm[f.key]" (click)="uploadMasterForm(f)">
           <mat-spinner *ngIf="isUploadingClientForm[f.key]" diameter="20"></mat-spinner>

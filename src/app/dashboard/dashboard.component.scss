@@ -404,3 +404,20 @@ app-calendar-component {
     }
   }
 }
+
+
+/* Drag-and-drop target for each Master Forms slot (David, Aug 31).
+   The file chooser stays inside it, so both routes work. */
+.form-dropzone {
+  border: 2px dashed #b9c2d0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 4px 0 6px;
+  background: #fafbfc;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.form-dropzone.dragging {
+  border-color: #1f7a33;
+  background: #eaf7ee;
+}
