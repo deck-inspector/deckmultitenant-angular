@@ -43,6 +43,22 @@ export class DashboardComponent implements OnInit {
   // Client FORM masters (blank fillable forms for ALL clients): the Final
   // Report Upon Completion (.docm, macros + dropdowns) and the Notice of
   // Unsafe Conditions (.docx). One master each, branded per-client on download.
+  // The FIVE master forms, in the order David wants them on the main page.
+  // 'kind' decides which existing endpoint each slot posts to - the mappings
+  // are unchanged, only the place they are presented.
+  masterForms: { key: string; label: string; accept: string; kind: string; note: string }[] = [
+    { key: 'proposalmaster', kind: 'proposal', label: 'Proposal Document', accept: '.docx',
+      note: 'The proposal used for ALL clients (a client with its own uploaded proposal keeps that one).' },
+    { key: 'visualmaster', kind: 'final', label: 'Visual Inspection Report', accept: '.docx',
+      note: 'The master Visual / Final Report generated for every client.' },
+    { key: 'finalcompletion', kind: 'clientform', label: 'Final Inspection Upon Owner Supplied Photos', accept: '.docm,.docx',
+      note: 'Keep as macro-enabled .docm so its dropdowns and colour-on-select keep working.' },
+    { key: 'finalrepairsmaster', kind: 'clientform', label: 'Final Inspection Upon Onsite Visit', accept: '.docx',
+      note: 'Generation master for on-site repairs inspections - project data, photos and PASS/FAIL are inserted automatically.' },
+    { key: 'unsafeconditions', kind: 'clientform', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm',
+      note: 'Blank fillable form offered under every client\'s Reports tab.' },
+  ];
+
   clientForms: { key: string; label: string; accept: string }[] = [
     { key: 'finalcompletion', label: 'Final Report Upon Visual, Owner Supplied Photos', accept: '.docm,.docx' },
     { key: 'unsafeconditions', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm' },
@@ -110,6 +126,34 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.clientFormFile[key] = file;
+  }
+
+  // Upload for the Master Forms panel: same three endpoints as before, chosen
+  // by the slot's kind. Nothing about the report mappings changes.
+  async uploadMasterForm(form: { key: string; kind: string; label: string }) {
+    const file = this.clientFormFile[form.key];
+    if (!file) {
+      this.toast.error('Please choose the file first.');
+      return;
+    }
+    this.isUploadingClientForm[form.key] = true;
+    try {
+      if (form.kind === 'clientform') {
+        await this.tenantsService.replaceClientForm(form.key, file).toPromise();
+      } else if (form.kind === 'final') {
+        await this.tenantsService.replaceFinalTemplate('master', file).toPromise();
+      } else {
+        await this.tenantsService.replaceProposalTemplate('master', file).toPromise();
+      }
+      this.toast.success(form.label + ' replaced for ALL clients.');
+      this.clientFormFile[form.key] = null;
+      this.loadClientFormStatus();
+    } catch (error) {
+      console.error('Master form upload failed:', error);
+      this.toast.error('Upload failed - ' + form.label + ' was NOT changed.');
+    } finally {
+      this.isUploadingClientForm[form.key] = false;
+    }
   }
 
   async uploadClientForm(key: string) {

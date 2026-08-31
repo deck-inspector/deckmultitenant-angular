@@ -115,66 +115,38 @@
     </div>
     <div class="frozen-glass"></div>
   </div>
-  <!-- ===== CORRECTED FINAL REPORT - MASTER TEMPLATE (ALL clients) ===== -->
-  <div
-    class="widget news template-widget"
-    cdkDrag
-    cdkDragBoundary=".widget-container"
-    #widget
-    (cdkDragEnded)="getWidgetFinalPos($event)"
-  >
-    <div class="widget-description-container">
-      <mat-icon class="template-widget-icon">description</mat-icon>
-      <h2>Final Report Template</h2>
-    </div>
-    <div class="template-upload">
-      <p class="template-note">
-        The <b>one corrected Final Report</b> used for <b>ALL clients</b>. Only each
-        client's company name, phone, and their header/footer logos (from this admin
-        panel) change per client. Uploading here replaces it immediately for the
-        next report generated, and it is stored durably.
-      </p>
-      <input type="file" id="masterTemplateInput" accept=".docx" (change)="onMasterTemplateSelected($event)" />
-      <p class="template-chosen" *ngIf="masterTemplateFile">&#128196; {{ masterTemplateFile.name }}</p>
-      <button mat-button class="template-btn" [disabled]="!masterTemplateFile || isUploadingMasterTemplate" (click)="uploadMasterTemplate()">
-        <mat-spinner *ngIf="isUploadingMasterTemplate" diameter="20"></mat-spinner>
-        <span *ngIf="!isUploadingMasterTemplate">Replace master template (ALL clients)</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Client blank FORMS (Final Upon Completion, Notice of Unsafe Conditions).
-       One master each for ALL clients; branded per-client on download and
-       offered under each client's Reports tab. -->
+  <!-- ===== MASTER FORMS (ALL clients) =====
+       The five master documents, all on the main page (David, Aug 31). Each
+       slot posts to the SAME endpoint it always did - the proposal template,
+       the Visual/Final report master, and the three client forms - so report
+       mappings are unchanged. Every client uses these masters, and each
+       client's own logo, header and footer are stamped on at the moment their
+       report is generated, never onto the master itself. -->
   <div class="widget template-widget">
     <div class="widget-description-container">
       <mat-icon class="template-widget-icon">assignment</mat-icon>
-      <h2>Client Forms</h2>
+      <h2>Master Forms</h2>
     </div>
     <div class="template-upload">
       <p class="template-note">
-        Blank fillable forms offered to <b>ALL clients</b> under their <b>Reports</b>
-        tab. Each client's own header/footer logos are stamped on at download. Upload
-        here to replace the master used by every client. Keep the
-        <b>Final Report Upon Visual, Owner Supplied Photos</b> as a macro-enabled
-        <b>.docm</b> so its dropdowns and color-on-select keep working. The
-        <b>Master Final Upon Repairs, Onsite Visit</b> (.docx) is the
-        generation master for on-site repairs inspections &mdash; project data,
-        photos, PASS/FAIL and each client's own branding are inserted
-        automatically when the report is created.
+        The five masters used by <b>ALL clients</b>. Replacing one here replaces it for
+        every client immediately. Each client's own header and footer logos and company
+        details are applied when their report is created &mdash; the masters stay unbranded.
       </p>
-      <div class="client-form-row" *ngFor="let f of clientForms" style="margin-bottom:14px">
+
+      <div class="client-form-row" *ngFor="let f of masterForms" style="margin-bottom:16px">
         <h6>{{ f.label }}</h6>
-        <p class="template-note" style="margin:2px 0 6px" *ngIf="clientFormStatus[f.key] as st">
+        <p class="template-note" style="margin:2px 0 4px" *ngIf="clientFormStatus[f.key] as st">
           <ng-container *ngIf="st.source === 'uploaded'; else builtIn">
             Last upload: <b>{{ st.uploadedAt | date : 'M/d/yyyy h:mm a' }}</b>
             <ng-container *ngIf="st.fileName"> &mdash; {{ st.fileName }}</ng-container>
           </ng-container>
           <ng-template #builtIn>Built-in master (never replaced here)</ng-template>
         </p>
-        <input type="file" [id]="'clientFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
+        <p class="template-note" style="margin:2px 0 6px">{{ f.note }}</p>
+        <input type="file" [id]="'masterFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
         <p class="template-chosen" *ngIf="clientFormFile[f.key]">&#128196; {{ clientFormFile[f.key]?.name }}</p>
-        <button mat-button class="template-btn" [disabled]="!clientFormFile[f.key] || isUploadingClientForm[f.key]" (click)="uploadClientForm(f.key)">
+        <button mat-button class="template-btn" [disabled]="!clientFormFile[f.key] || isUploadingClientForm[f.key]" (click)="uploadMasterForm(f)">
           <mat-spinner *ngIf="isUploadingClientForm[f.key]" diameter="20"></mat-spinner>
           <span *ngIf="!isUploadingClientForm[f.key]">Replace for ALL clients</span>
         </button>
