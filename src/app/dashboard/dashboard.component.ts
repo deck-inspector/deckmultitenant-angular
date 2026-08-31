@@ -46,16 +46,16 @@ export class DashboardComponent implements OnInit {
   // The FIVE master forms, in the order David wants them on the main page.
   // 'kind' decides which existing endpoint each slot posts to - the mappings
   // are unchanged, only the place they are presented.
-  masterForms: { key: string; label: string; accept: string; kind: string; note: string }[] = [
-    { key: 'proposalmaster', kind: 'proposal', label: 'Proposal Document', accept: '.docx',
+  masterForms: { key: string; label: string; accept: string; kind: string; ext: string; note: string }[] = [
+    { key: 'proposalmaster', kind: 'proposal', label: 'Proposal Document', accept: '.docx', ext: 'docx',
       note: 'The proposal used for ALL clients (a client with its own uploaded proposal keeps that one).' },
-    { key: 'visualmaster', kind: 'final', label: 'Visual Inspection Report', accept: '.docx',
+    { key: 'visualmaster', kind: 'final', label: 'Visual Inspection Report', accept: '.docx', ext: 'docx',
       note: 'The master Visual / Final Report generated for every client.' },
-    { key: 'finalcompletion', kind: 'clientform', label: 'Final Inspection Upon Owner Supplied Photos', accept: '.docm,.docx',
+    { key: 'finalcompletion', kind: 'clientform', label: 'Final Inspection Upon Owner Supplied Photos', accept: '.docm,.docx', ext: 'docm',
       note: 'Keep as macro-enabled .docm so its dropdowns and colour-on-select keep working.' },
-    { key: 'finalrepairsmaster', kind: 'clientform', label: 'Final Inspection Upon Onsite Visit', accept: '.docx',
+    { key: 'finalrepairsmaster', kind: 'clientform', label: 'Final Inspection Upon Onsite Visit', accept: '.docx', ext: 'docx',
       note: 'Generation master for on-site repairs inspections - project data, photos and PASS/FAIL are inserted automatically.' },
-    { key: 'unsafeconditions', kind: 'clientform', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm',
+    { key: 'unsafeconditions', kind: 'clientform', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm', ext: 'docx',
       note: 'Blank fillable form offered under every client\'s Reports tab.' },
   ];
 
@@ -72,7 +72,8 @@ export class DashboardComponent implements OnInit {
   isUploadingClientForm: { [key: string]: boolean } = {};
   // Last-upload info per slot (date + uploaded file name), from the backend
   // blob metadata - shown under each slot title (David, Aug 22).
-  clientFormStatus: { [key: string]: { uploadedAt: string | null; fileName: string | null; source: string } } = {};
+  clientFormStatus: { [key: string]: any } = {};
+  isDownloadingMaster: { [key: string]: boolean } = {};
 
   /**
    * @param usersService The UsersService is injected to access client data and perform CRUD operations.
@@ -126,6 +127,27 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.clientFormFile[key] = file;
+  }
+
+  // Download the current master so it can be edited and put back in the SAME
+  // slot - editing the live document instead of authoring a new form.
+  downloadMasterForm(form: { key: string; label: string; ext: string }) {
+    this.isDownloadingMaster[form.key] = true;
+    this.tenantsService.downloadMasterForm(form.key).subscribe({
+      next: (blob: Blob) => {
+        this.isDownloadingMaster[form.key] = false;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = form.label + '.' + (form.ext || 'docx');
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      },
+      error: () => {
+        this.isDownloadingMaster[form.key] = false;
+        this.toast.error('Could not download ' + form.label + '.');
+      },
+    });
   }
 
   // Upload for the Master Forms panel: same three endpoints as before, chosen
@@ -183,7 +205,15 @@ export class DashboardComponent implements OnInit {
       next: (data: any) => {
         const map: any = {};
         for (const f of (data && data.forms) || []) {
-          map[f.key] = { uploadedAt: f.uploadedAt || null, fileName: f.fileName || null, source: f.source || 'none' };
+          map[f.key] = {
+            uploadedAt: f.uploadedAt || null,
+            fileName: f.fileName || null,
+            source: f.source || 'none',
+            bytes: f.bytes || null,
+            docModified: f.docModified || null,
+            docCreated: f.docCreated || null,
+            lastModifiedBy: f.lastModifiedBy || null,
+          };
         }
         this.clientFormStatus = map;
       },

@@ -132,18 +132,29 @@
         The five masters used by <b>ALL clients</b>. Replacing one here replaces it for
         every client immediately. Each client's own header and footer logos and company
         details are applied when their report is created &mdash; the masters stay unbranded.
+        <br><b>To edit a form:</b> download the current one, make your changes in Word, then upload
+        it back into the same slot. That keeps one master per form instead of creating new ones.
       </p>
 
       <div class="client-form-row" *ngFor="let f of masterForms" style="margin-bottom:16px">
         <h6>{{ f.label }}</h6>
-        <p class="template-note" style="margin:2px 0 4px" *ngIf="clientFormStatus[f.key] as st">
-          <ng-container *ngIf="st.source === 'uploaded'; else builtIn">
-            Last upload: <b>{{ st.uploadedAt | date : 'M/d/yyyy h:mm a' }}</b>
-            <ng-container *ngIf="st.fileName"> &mdash; {{ st.fileName }}</ng-container>
+        <p class="template-note" style="margin:2px 0 2px" *ngIf="clientFormStatus[f.key] as st">
+          <b>Version: {{ (st.docModified || st.uploadedAt) ? ((st.docModified || st.uploadedAt) | date : 'M/d/yyyy h:mm a') : 'unknown' }}</b>
+          <ng-container *ngIf="st.docModified"> (document last edited)</ng-container>
+          <ng-container *ngIf="!st.docModified && st.uploadedAt"> (file date)</ng-container>
+        </p>
+        <p class="template-note" style="margin:0 0 4px" *ngIf="clientFormStatus[f.key] as st">
+          <ng-container *ngIf="st.source === 'uploaded'">
+            Uploaded {{ st.uploadedAt | date : 'M/d/yyyy h:mm a' }}<ng-container *ngIf="st.fileName"> &mdash; {{ st.fileName }}</ng-container>
           </ng-container>
-          <ng-template #builtIn>Built-in master (never replaced here)</ng-template>
+          <ng-container *ngIf="st.source !== 'uploaded'">Built-in master (not yet replaced here)</ng-container>
+          <ng-container *ngIf="st.bytes"> &middot; {{ (st.bytes / 1024) | number : '1.0-0' }} KB</ng-container>
         </p>
         <p class="template-note" style="margin:2px 0 6px">{{ f.note }}</p>
+        <button mat-button class="template-btn" style="margin-bottom:6px" [disabled]="isDownloadingMaster[f.key]" (click)="downloadMasterForm(f)">
+          <mat-spinner *ngIf="isDownloadingMaster[f.key]" diameter="20"></mat-spinner>
+          <span *ngIf="!isDownloadingMaster[f.key]">&#11015; Download current form</span>
+        </button>
         <input type="file" [id]="'masterFormInput_' + f.key" [accept]="f.accept" (change)="onClientFormSelected(f.key, $event)" />
         <p class="template-chosen" *ngIf="clientFormFile[f.key]">&#128196; {{ clientFormFile[f.key]?.name }}</p>
         <button mat-button class="template-btn" [disabled]="!clientFormFile[f.key] || isUploadingClientForm[f.key]" (click)="uploadMasterForm(f)">
