@@ -162,6 +162,13 @@ export class TenantsService {
     return this.httpClient.post<any>(url, formData, this.options);
   }
 
+  // Download the CURRENT master for a slot, exactly as stored (no branding),
+  // so it can be edited and uploaded back into the same slot.
+  downloadMasterForm(key: string): Observable<Blob> {
+    const url = `${environment.apiUrl}/project/masterform?key=${encodeURIComponent(key)}`;
+    return this.httpClient.get(url, { headers: this.options.headers, responseType: 'blob' as 'blob' });
+  }
+
   // Per-slot last-upload info for the Client Forms widget (date + original
   // file name of the most recent upload of each master).
   getClientFormsStatus(): Observable<any> {
