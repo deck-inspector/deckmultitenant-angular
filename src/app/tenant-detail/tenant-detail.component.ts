@@ -17,6 +17,9 @@ export class TenantDetailComponent {
   tenantDetails: any; // Adjust the type based on your tenant model
   showPassword: boolean[]; // Declare the array
   tenantId: string;
+  resetIdx: number = -1;
+  newPassword: string = '';
+  resetting: boolean = false;
 
     /**
    *
@@ -126,6 +129,27 @@ export class TenantDetailComponent {
   //     }
   //   );
   // }
+
+  startReset(i: number): void { this.resetIdx = i; this.newPassword = ''; }
+  cancelReset(): void { this.resetIdx = -1; this.newPassword = ''; }
+  saveReset(admin: any): void {
+    const pwd = (this.newPassword || '').trim();
+    if (!pwd) { this.toast.error('Enter a new password'); return; }
+    this.resetting = true;
+    this.tenantsService.resetAdminPassword(this.tenantId, admin.username, pwd).subscribe(
+      () => {
+        this.resetting = false;
+        this.toast.success('Password reset for ' + admin.username);
+        this.cancelReset();
+        this.getTenantDetails(this.tenantId);
+      },
+      (error) => {
+        this.resetting = false;
+        const msg = (error && (error.error && typeof error.error === 'string' ? error.error : error.message)) || 'Reset failed';
+        this.toast.error('Error: ' + msg);
+      }
+    );
+  }
 
   togglePasswordVisibility(index: number): void {
     this.showPassword[index] = !this.showPassword[index];

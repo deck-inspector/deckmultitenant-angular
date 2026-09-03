@@ -98,8 +98,7 @@
               <th>Username</th>
               <th>Email</th>
               <th>Password</th>
-              <!-- <th>Status</th>
-                <th></th> -->
+              <th>Reset</th>
             </tr>
 
             <tr *ngFor="let admin of tenantDetails?.adminDetails; let i = index">
@@ -115,6 +114,16 @@
                 <button mat-icon-button (click)="togglePasswordVisibility(i)">
                   <mat-icon>{{ showPassword[i] ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
+              </td>
+              <td class="reset-td">
+                <ng-container *ngIf="resetIdx !== i">
+                  <button mat-stroked-button color="primary" (click)="startReset(i)">Reset password</button>
+                </ng-container>
+                <ng-container *ngIf="resetIdx === i">
+                  <input class="reset-input" type="text" [(ngModel)]="newPassword" placeholder="New password" autocomplete="off" />
+                  <button mat-flat-button color="primary" [disabled]="resetting || !newPassword" (click)="saveReset(admin)">Save</button>
+                  <button mat-button (click)="cancelReset()">Cancel</button>
+                </ng-container>
               </td>
             </tr>
           </table>
