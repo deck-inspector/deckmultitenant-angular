@@ -118,6 +118,11 @@ export class TenantsService {
     return this.httpClient.post<any>(apiUrl, adminDetails, this.options);
   }
 
+  resetAdminPassword(tenantId: string, username: string, password: string): Observable<any> {
+    const apiUrl = `${environment.apiUrl}/tenants/${tenantId}/resetAdminPassword`;
+    return this.httpClient.post<any>(apiUrl, { username, password }, this.options);
+  }
+
   increaseCustomFormCount(tenantId: string, count: string): Observable<any> {
     const apiUrl = `${environment.apiUrl}/tenants/${tenantId}/increasecustomformcount/${count}`;
     return this.httpClient.post<any>(apiUrl, {}, this.options);
