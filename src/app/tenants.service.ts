@@ -41,6 +41,11 @@ export class TenantsService {
     return this.httpClient.delete<any>(url, this.options);
   }
 
+  restoreTenant(tenantId: string): Observable<any> {
+    const url = `${environment.apiUrl}/tenants/${tenantId}/restore`;
+    return this.httpClient.post<any>(url, {}, this.options);
+  }
+
   toggleAccessForTenant(tenantId: string, state: boolean): Observable<any> {
     const url = `${environment.apiUrl}/tenants/${tenantId}/toggletenantstatus/${state ? 1 : 0}`;
     return this.httpClient.post<any>(url, {}, this.options);
