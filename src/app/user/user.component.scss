@@ -191,3 +191,15 @@ button.mat-icon-button {
   max-height: auto; /* Adjust the height as needed */
   overflow-y: auto;
 }
+
+.deleted-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  vertical-align: middle;
+}

@@ -72,14 +72,15 @@
           </a>
         </td>
         <td>
-          <p> {{ user?.isActive ? 'Active' : 'Inactive' }}</p>
+          <p> {{ user?.isActive ? 'Active' : 'Inactive' }}<span *ngIf="user?.isDeleted" class="deleted-badge" title="This client was deleted. Its users cannot log in until it is restored.">Deleted</span></p>
         </td>
   
         <td>
           <mat-menu #editMenu="matMenu">
             <button mat-menu-item (click)="openEditDialog(user.id)">Edit Branding</button>
             <button mat-menu-item (click)="openAdminDialog(user.id)">Add Admin</button>
-            <button mat-menu-item (click)="DeleteTenant(user.id)">Delete Tenant</button>
+            <button mat-menu-item *ngIf="!user?.isDeleted" (click)="DeleteTenant(user.id)">Delete Tenant</button>
+            <button mat-menu-item *ngIf="user?.isDeleted" (click)="RestoreTenant(user.id)">Restore Tenant</button>
             <button mat-menu-item (click)="toggleStatus(user.id, user.isActive)">Toggle Status</button>
           </mat-menu>
         

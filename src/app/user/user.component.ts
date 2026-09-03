@@ -401,6 +401,16 @@ export class UserComponent {
     );
   }
 
+  RestoreTenant(tenantId: string): void {
+    this.tenantsService.restoreTenant(tenantId).subscribe(
+      () => {
+        this.toast.success('Tenant restored - its users can log in again');
+        setTimeout(() => { window.location.reload(); }, 1500);
+      },
+      () => { this.toast.error('Failed to restore the Tenant'); }
+    );
+  }
+
   toggleStatus(tenantId: string, status: boolean) {
     this.tenantsService
       .toggleAccessForTenant(tenantId, !status)
