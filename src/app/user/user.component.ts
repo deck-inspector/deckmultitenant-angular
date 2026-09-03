@@ -26,7 +26,7 @@ import { LoginService } from '../login.service';
   styleUrls: ['./user.component.scss'],
 })
 export class UserComponent {
-  users$: any[];
+  users$: any[] = [];
   searchText!: string;
   numberOfClients: number = 0;
   companyInput: boolean = false;
