@@ -56,6 +56,11 @@ export class AppComponent implements OnInit {
     });
   }
 
+  // Android APK install page (always the newest signed build); opens in a new tab.
+  openApk() {
+    window.open('https://www.e3-web.com/apk', '_blank', 'noopener');
+  }
+
   logout() {
     localStorage.clear();
     this.router.navigateByUrl('/login');
