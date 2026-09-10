@@ -13,6 +13,9 @@
       <li [routerLink]="['/expenses']"><mat-icon>payment</mat-icon>Expenses</li>
       <li [routerLink]="['/custom-forms']"><mat-icon>description</mat-icon>Custom Forms</li>
       <li [routerLink]="['/tenant-users']"><mat-icon>description</mat-icon>Users</li>
+      <!-- Field app download (David, Sep 10 2026): the signed Android APK is published to
+           e3-web.com/apk by the android-apk workflow; the page always shows the newest build. -->
+      <li (click)="openApk()" title="Download the E3 Inspections Android app (APK) for field phones"><mat-icon>android</mat-icon>Android App</li>
       <!-- <li [routerLink]="['/news']"><mat-icon>feed</mat-icon>News</li>
       <li [routerLink]="['/info']"><mat-icon>info</mat-icon>Help</li>
 
