@@ -380,6 +380,27 @@ app-calendar-component {
       margin: 0 0 0.6rem 0;
     }
 
+    // Master form slot title (David, Sep 10 2026): the slot name was a tiny
+    // Material h6, smaller than the version line under it. Make it the
+    // largest text in the slot and separate slots with a rule.
+    .client-form-row {
+      padding-top: 0.9rem;
+      border-top: 1px solid #e3e8f0;
+
+      &:first-of-type {
+        border-top: 0;
+        padding-top: 0.2rem;
+      }
+
+      h6 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #141d2f;
+        letter-spacing: 0.01em;
+        margin: 0 0 0.35rem 0;
+      }
+    }
+
     input[type='file'] {
       font-size: 0.85rem;
       margin-bottom: 0.4rem;
