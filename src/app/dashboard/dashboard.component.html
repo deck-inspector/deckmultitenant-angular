@@ -1,119 +1,29 @@
 <div class="dashboard">
-  <div
-    class="widget weather"
-    cdkDrag
-    cdkDragBoundary=".widget-container"
-    #widget
-    (cdkDragEnded)="getWidgetFinalPos($event)"
-  >
-    <div class="greeting">
-      <h1>Hello,</h1>
-      <h1 style="color: #29abe2">
-        {{ storedUsername }}!
-      </h1>
-    </div>
-
-    <!-- <div *ngIf="cityName && temperature" class="data"> -->
-    <div class="data">
-      <!-- <h2 style="margin-left: 0.5rem">
-        {{ cityName }}
-      </h2>
-      <h2>{{ temperature }} C°</h2>
-      <img [src]="'assets/img/icons/' + weatherIcon + '.svg'" alt="" /> -->
-    </div>
-
-    <!-- <div
-      *ngIf="!cityName && !temperature && !noGeo"
-      class="fetching-weather-container"
-      style="margin-top: 2rem"
-    > -->
-    <div
-      class="fetching-weather-container"
-      style="margin-top: 2rem"
-    >
-      <!-- <h2>Fetching weather data</h2>
-      <mat-spinner></mat-spinner> -->
-    </div>
-    <!-- <div
-      *ngIf="!cityName && !temperature && noGeo"
-      class="fetching-weather-container"
-      style="margin-top: 2rem"
-    > -->
-    <div
-      class="fetching-weather-container"
-      style="margin-top: 2rem"
-    >
-      <!-- <h2>Geolocation disabled <mat-icon>sentiment_dissatisfied</mat-icon></h2>
-      <p style="margin: 0; margin-top: 0.5rem">
-        Enable gelocation & refresh page.
-      </p> -->
-    </div>
-  </div>
-  <!-- <div
-    class="widget news"
-    cdkDrag
-    cdkDragBoundary=".widget-container"
-    #widget
-    (cdkDragEnded)="getWidgetFinalPos($event)"
-  >
+  <!-- ===== CLIENTS AT A GLANCE (David, Sep 24 2026) =====
+       Replaces the empty "Hello" and "Notifications" boxes. One row per client,
+       click a row for the client's page (details, branding, people, inspection
+       forms, billing). -->
+  <div class="widget clients-widget">
     <div class="widget-description-container">
-      <img src="assets/img/news.png" alt="" class="widget-icon news" />
-      <h2>News Spotlight</h2>
+      <mat-icon class="template-widget-icon">groups</mat-icon>
+      <h2>Clients</h2>
+      <span class="clients-count" *ngIf="!tenantsLoading">{{ activeCount }} active of {{ tenants.length }}</span>
+      <span class="clients-spacer"></span>
+      <a class="clients-all" routerLink="/users">Manage clients &rarr;</a>
     </div>
-    <div class="news-container" *ngIf="newsService.news$ | async as newsData">
-      <div
-        class="article"
-        *ngFor="let article of newsData.articles.slice(0, 3)"
-      >
-        <img [src]="article.image" alt="news-img" (error)="newsService.replaceImg($event)"/>
-        <p class="article-text">{{ article.title }}</p>
-        <a [href]="article.url" target="_blank">Read</a>
-      </div>
-    </div>
-    <div *ngIf="!(newsService.news$ | async) && !(newsService.error$ | async)" class="news-buffer spinner">
-      <mat-spinner></mat-spinner>
-      <h1>Loading News...</h1>
-    </div>
-    <div *ngIf="newsService.error$ | async" class="news-buffer error">
-      <mat-icon>warning</mat-icon>
-      <h1>Newsfeed Blocked By Provider</h1>
-    </div>
-  </div> -->
-  <div
-    class="widget news"
-    cdkDrag
-    cdkDragBoundary=".widget-container"
-    #widget
-    (cdkDragEnded)="getWidgetFinalPos($event)"
-  >
-  <!-- Add (click)="openCalendarViewDialog()" to open calendar -->
-    <div class="widget-description-container">
-      <img src="assets/img/notifications.png" alt="" class="widget-icon" />
-      <h2>Notifications</h2>
-    </div>
-    <div *ngIf="events && events.length === 0" class="widget-user-prompt">
-      <p class="placeholder">No notifications</p>
-    </div>
-    <div class="events-container" *ngIf="events && events.length > 0">
-      <ul>
-        <li *ngFor="let event of events">
-          <div class="event-wrapper">
-            <div><mat-icon>event</mat-icon> {{ event.title }}</div>
-            <div>
-              <mat-icon>schedule</mat-icon>
-              {{
-                event.start.toDate().toLocaleTimeString("en-US", {
-                  hour12: false,
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })
-              }}
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="frozen-glass"></div>
+    <div class="clients-loading" *ngIf="tenantsLoading"><mat-spinner diameter="22"></mat-spinner> Loading clients&hellip;</div>
+    <table class="clients-table" *ngIf="!tenantsLoading && tenants.length">
+      <tr><th>Client</th><th>Status</th><th>Valid until</th><th>Users</th><th>Storage</th><th>Reports</th></tr>
+      <tr *ngFor="let t of tenants" (click)="openClient(t)" [class.deleted]="t.isDeleted">
+        <td data-label="Client"><b>{{ t.name }}</b><div class="clients-desc">{{ t.companyDescription }}</div></td>
+        <td data-label="Status"><span class="cchip" [class.ok]="t.isActive && !t.isDeleted" [class.warn]="!t.isActive && !t.isDeleted" [class.bad]="t.isDeleted">{{ t.isDeleted ? 'Deleted' : (t.isActive ? 'Active' : 'Inactive') }}</span></td>
+        <td data-label="Valid until" [class.overdue]="isPast(t.endDate)">{{ t.endDate | date:'M/d/yyyy' }}</td>
+        <td data-label="Users">{{ usersOf(t) }}</td>
+        <td data-label="Storage">{{ gb(t.usedDiskSpace) }} / {{ t.allowedDiskSpace ?? 0 }} GB</td>
+        <td data-label="Reports">{{ t.reportsCount ?? t.reportCount ?? 0 }}</td>
+      </tr>
+    </table>
+    <p class="clients-empty" *ngIf="!tenantsLoading && !tenants.length">No clients yet.</p>
   </div>
   <!-- ===== MASTER FORMS (ALL clients) =====
        The five master documents, all on the main page (David, Aug 31). Each
