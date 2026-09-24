@@ -8,15 +8,11 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class FormsService {
-  options: any;
+  constructor(private httpClient: HttpClient) {}
 
-  constructor(private httpClient: HttpClient) {
-    const headers = new HttpHeaders({
-      'Authorization': localStorage.getItem('authorization')!
-    });
-
-    // Include the headers in the request
-    this.options = { headers: headers };
+  // Read the token on EVERY request (Sep 24 2026) - see TenantsService.
+  get options(): any {
+    return { headers: new HttpHeaders({ 'Authorization': localStorage.getItem('authorization') || '' }) };
   }
 
   addForm(data: Form): Observable<any> {
