@@ -9,10 +9,9 @@
 
     <ul>
       <li [routerLink]="['/']"><mat-icon>fact_check</mat-icon>Dashboard</li>
+      <!-- Sep 24 2026: Users, Expenses and Custom Forms moved INTO each client's page
+           (People / Billing / Inspection Forms tabs). The old routes still work. -->
       <li [routerLink]="['/users']"><mat-icon>groups</mat-icon>Clients</li>
-      <li [routerLink]="['/expenses']"><mat-icon>payment</mat-icon>Expenses</li>
-      <li [routerLink]="['/custom-forms']"><mat-icon>description</mat-icon>Custom Forms</li>
-      <li [routerLink]="['/tenant-users']"><mat-icon>description</mat-icon>Users</li>
       <!-- Field app download (David, Sep 10 2026): the signed Android APK is published to
            e3-web.com/apk by the android-apk workflow; the page always shows the newest build. -->
       <li (click)="openApk()" title="Download the E3 Inspections Android app (APK) for field phones"><mat-icon>android</mat-icon>Android App</li>
