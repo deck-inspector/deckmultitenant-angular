@@ -442,3 +442,53 @@ app-calendar-component {
   border-color: #1f7a33;
   background: #eaf7ee;
 }
+
+/* ===== Sep 24 2026 - dashboard is now two full-width panels: Clients at a glance, then Master
+   Forms. The old 3x3 widget grid (weather / news / calendar) is gone. ===== */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: auto;
+  max-width: 1500px;
+}
+.dashboard .widget.template-widget { grid-column: unset; grid-row: unset; }
+.dashboard .widget.clients-widget {
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
+  cursor: default;
+  padding: 1rem 1.25rem;
+
+  .widget-description-container { width: 100%; }
+  .template-widget-icon { color: #29abe2; margin-right: 1rem; }
+  .clients-count { margin-left: 12px; font-size: 12px; font-weight: 600; background: #eef1f5; border-radius: 99px; padding: 2px 10px; color: #3b4652; }
+  .clients-spacer { flex: 1; }
+  .clients-all { color: #29abe2; font-weight: 600; text-decoration: none; font-size: 14px; &:hover { text-decoration: underline; } }
+  .clients-loading { display: flex; align-items: center; gap: 10px; color: #5f6b7a; padding: 10px 0; }
+  .clients-empty { color: #5f6b7a; }
+
+  .clients-table {
+    width: 100%; border-collapse: collapse; margin-top: 8px;
+    th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: #5f6b7a; padding: 6px 8px; border-bottom: 1px solid #e3e7ee; }
+    td { padding: 9px 8px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+    tr:not(:first-child) { cursor: pointer; }
+    tr:not(:first-child):hover td { background: #f5f8fc; }
+    tr.deleted td { color: #8a949f; }
+    td.overdue { color: #c62828; font-weight: 600; }
+    .clients-desc { font-size: 12px; color: #5f6b7a; font-weight: 400; }
+  }
+  .cchip { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 99px; background: #eef1f5; color: #3b4652;
+    &.ok { background: #e3f4e9; color: #1e824c; } &.warn { background: #fdf3e3; color: #b45f05; } &.bad { background: #fde3e0; color: #c62828; } }
+}
+
+@media (max-width: 680px) {
+  .dashboard .widget.clients-widget {
+    .clients-table, .clients-table tr, .clients-table td { display: block; width: 100%; box-sizing: border-box; }
+    .clients-table tr:first-child { display: none; }
+    .clients-table tr { border: 1px solid #e3e7ee; border-radius: 12px; padding: 6px 10px; margin-bottom: 10px; }
+    .clients-table td { display: flex; gap: 8px; align-items: center; padding: 4px 0; border-bottom: 1px dashed #eceff2;
+      &::before { content: attr(data-label); flex: 0 0 84px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #5f6b7a; }
+      &:last-child { border-bottom: 0; } }
+  }
+}
