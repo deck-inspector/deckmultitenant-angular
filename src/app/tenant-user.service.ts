@@ -8,14 +8,11 @@ import { environment } from 'src/environments/environment';
 })
 export class TenantUserService {
 
-  options: any;
-  constructor(private httpClient: HttpClient, private toast: HotToastService) { 
-    const headers = new HttpHeaders({
-      'Authorization': localStorage.getItem('authorization')!
-    });
-  
-    // Include the headers in the request
-    this.options = { headers: headers };
+  constructor(private httpClient: HttpClient, private toast: HotToastService) {}
+
+  // Read the token on EVERY request (Sep 24 2026) - see TenantsService.
+  get options(): any {
+    return { headers: new HttpHeaders({ 'Authorization': localStorage.getItem('authorization') || '' }) };
   }
 
   getAllUsers(companyIdentifier: string): Promise<any>{
