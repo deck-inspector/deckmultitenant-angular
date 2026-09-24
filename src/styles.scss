@@ -103,3 +103,132 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     visibility: hidden !important;
   }
 }
+
+/* ===== Phone pass (David, Sep 24 2026) - admin site usable on a phone.
+   Everything below is scoped to max-width: 680px; desktop/tablet layout unchanged. ===== */
+
+/* Dialog surfaces sometimes stay in the "opening" animation state in this build
+   (same issue as the drawer above) and render faint - force them fully visible. */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (max-width: 680px) {
+  /* --- Shell: toolbar sized to content, page fills the rest, no 10vh/90vh split --- */
+  mat-sidenav-content.mat-drawer-content {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh;
+  }
+  mat-toolbar.mat-toolbar { height: auto !important; min-height: 56px; padding: 6px 10px !important; }
+  mat-toolbar-row.mat-toolbar-row { height: auto !important; padding: 0 !important; gap: 8px; }
+  mat-toolbar-row > div:nth-child(2) { display: none !important; }          /* long date - not needed on a phone */
+  mat-toolbar-row h2 { font-size: 1.05rem !important; white-space: nowrap; }
+  mat-toolbar-row .menu-icon { transform: scale(1.35); margin-right: .6rem !important; }
+  mat-toolbar-row .notifications-container img { width: 36px !important; }
+  mat-toolbar-row .notifications-container .userinfo-wrapper { right: 0; padding: .75rem 1.25rem; }
+  .router-container { flex: 1 1 auto; height: auto !important; min-height: 0; padding: 10px !important; overflow-x: hidden !important; }
+  .sidenav { width: 250px; max-width: 80vw; }
+
+  /* --- Page headers: title / count / search stack instead of squeezing into one row --- */
+  .searchbar-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px;
+    margin: .25rem 0 1rem 0 !important;
+  }
+  .searchbar-container h1 { font-size: 1.4rem !important; }
+  .searchbar-container h2 { font-size: 1.3rem !important; margin: 0 0 .25rem 0; }
+  .searchbar-container .search-items-wrapper,
+  .searchbar-container .search-form-field,
+  .searchbar-container #search-form { width: 100% !important; }
+  .searchbar-container select { width: 100%; font-size: 1rem; padding: 10px; }
+
+  /* --- Tables become stacked cards: one card per row, each cell labelled --- */
+  .table-wrapper { max-height: none !important; overflow: visible !important; padding: 8px !important; }
+  .user-table, .user-table tbody, .user-table tr, .user-table td { display: block !important; width: auto !important; }
+  .user-table tr:first-of-type { display: none !important; }                /* header row */
+  .user-table tr { position: static !important; }
+  .user-table tr.data-row, .user-table tr.ng-star-inserted:not(:first-of-type) {
+    background: #fff !important;
+    border: 1px solid #d9dde3;
+    border-radius: 12px;
+    margin: 0 0 10px 0;
+    padding: 10px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .user-table td {
+    padding: 5px 0 !important;
+    font-size: .95rem !important;
+    display: flex !important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    border-bottom: 1px dashed #eceff2;
+  }
+  .user-table td:last-child { border-bottom: 0; }
+  .user-table td:first-child { display: none !important; }                  /* row number */
+  .user-table td::before {
+    content: attr(data-label);
+    flex: 0 0 96px;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: #5f6b7a;
+  }
+  .user-table td mat-icon { margin-top: 0 !important; font-size: 1.25rem !important; }
+  .user-table td .name-sec, .user-table td.name-sec { padding: 6px 0 !important; }
+  .user-table .name-name { font-size: 1.05rem; margin-bottom: 4px !important; }
+  .user-table .name-div { flex: 1; }
+  .user-table td .web-link { word-break: break-all; }
+
+  /* Column labels (the header row is hidden on phones) */
+  app-user .user-table td:nth-child(2)::before { content: 'Client'; }
+  app-user .user-table td:nth-child(3)::before { content: 'Disk space'; }
+  app-user .user-table td:nth-child(4)::before { content: 'Valid until'; }
+  app-user .user-table td:nth-child(5)::before { content: 'Users'; }
+  app-user .user-table td:nth-child(6)::before { content: 'Website'; }
+  app-user .user-table td:nth-child(7)::before { content: 'Status'; }
+  app-user .user-table td:nth-child(8)::before { content: 'Actions'; }
+  app-user .user-table td:nth-child(7) p { margin: 0; }
+  app-user .user-table td:nth-child(8) button { color: #141d2f !important; }
+
+  app-tenant-users .user-table td:nth-child(2)::before { content: 'Name'; }
+  app-tenant-users .user-table td:nth-child(3)::before { content: 'Username'; }
+  app-tenant-users .user-table td:nth-child(4)::before { content: 'Email'; }
+  app-tenant-users .user-table td:nth-child(5)::before { content: 'Device'; }
+  app-tenant-users .user-table td:nth-child(6)::before { content: 'Inactive'; }
+  app-tenant-users .user-table td:nth-child(7)::before { content: 'Delete'; }
+
+  app-tenant-detail .user-table td:nth-child(2)::before { content: 'First name'; }
+  app-tenant-detail .user-table td:nth-child(3)::before { content: 'Last name'; }
+  app-tenant-detail .user-table td:nth-child(4)::before { content: 'Username'; }
+  app-tenant-detail .user-table td:nth-child(5)::before { content: 'Email'; }
+  app-tenant-detail .user-table td:nth-child(6)::before { content: 'Password'; }
+  app-tenant-detail .user-table td:nth-child(7)::before { content: 'Reset'; }
+
+  /* Floating "add" button stays reachable above the phone's home bar */
+  #add-user-btn { position: fixed !important; bottom: 18px !important; right: 18px !important; z-index: 5; }
+  .table-wrapper { margin-bottom: 84px; }
+
+  /* --- Dialogs fill the phone width --- */
+  .cdk-overlay-pane.custom-modalbox,
+  .custom-modalbox { width: 96vw !important; max-width: 96vw !important; max-height: 92vh !important; }
+  .cdk-overlay-pane { max-width: 96vw !important; }
+  .mat-mdc-dialog-surface { padding: .9rem .9rem 1.2rem .9rem !important; }
+  .mat-mdc-dialog-content, mat-dialog-content { max-height: 70vh !important; }
+  mat-dialog-actions, .mat-mdc-dialog-actions { flex-wrap: wrap; gap: 6px; }
+  mat-form-field, .mat-mdc-form-field { width: 100% !important; }
+  .mat-mdc-dialog-surface { overflow-x: hidden !important; }
+  .mat-mdc-dialog-container mat-form-field, .mat-mdc-dialog-container .mat-mdc-form-field,
+  .mat-mdc-dialog-container textarea, .mat-mdc-dialog-container input { max-width: 100% !important; box-sizing: border-box; }
+
+  /* Dashboard widgets: keep padding inside the phone width */
+  .dashboard, .dashboard .widget, .widget { box-sizing: border-box !important; }
+  .widget > * { max-width: 100%; }
+
+  /* Row-menu button on the Clients list gets a visible target */
+  app-user .user-table td:nth-child(8) button { border: 1px solid #d9dde3; border-radius: 8px; }
+}
