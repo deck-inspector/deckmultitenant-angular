@@ -8,15 +8,13 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class TenantsService {
-  options: any;
+  constructor(private httpClient: HttpClient) {}
 
-  constructor(private httpClient: HttpClient) {
-    const headers = new HttpHeaders({
-      'Authorization': localStorage.getItem('authorization')!
-    });
-  
-    // Include the headers in the request
-    this.options = { headers: headers };
+  // Read the token on EVERY request (Sep 24 2026). It used to be captured once
+  // in the constructor, so after re-login the old expired token was still sent
+  // until the site was closed and reopened.
+  get options(): any {
+    return { headers: new HttpHeaders({ 'Authorization': localStorage.getItem('authorization') || '' }) };
   }
 
   addTenant(data: Tenant): Observable<any> {
