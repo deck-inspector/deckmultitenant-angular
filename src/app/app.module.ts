@@ -29,7 +29,7 @@ import { UsersService } from './users.service';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 import { MatMenuModule } from '@angular/material/menu';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -64,7 +64,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 // import { LegalNoticeComponent } from './legal-notice/legal-notice.component';
 import { DialogWalkthroughComponent } from './dialog-walkthrough/dialog-walkthrough.component';
 import { TenantsService } from './tenants.service';
-import { LoginService } from './login.service';
+import { LoginService, AuthInterceptor } from './login.service';
 import { DialogEditDescriptionComponent } from './dialog-edit-description/dialog-edit-description.component';
 import { DialogEditDiskSpaceComponent } from './dialog-edit-disk-space/dialog-edit-disk-space.component';
 import { DialogEditValidityComponent } from './dialog-edit-validity/dialog-edit-validity.component';
@@ -153,7 +153,13 @@ import { TenantUsersComponent } from './tenant-users/tenant-users.component';
     provideStorage(() => getStorage()),
     FontAwesomeModule,
   ],
-  providers: [UsersService, TenantsService, LoginService],
+  providers: [
+    UsersService,
+    TenantsService,
+    LoginService,
+    // Sep 24 2026 - current token on every request; 401/403 -> back to login.
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
