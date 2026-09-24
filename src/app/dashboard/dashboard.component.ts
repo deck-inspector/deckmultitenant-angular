@@ -283,7 +283,35 @@ export class DashboardComponent implements OnInit {
   /**
    * Get gelocation, current date/time & current weather to then be displayed within dashboard widgets.
    */
+  // Clients at a glance (David, Sep 24 2026): every client on the main page,
+  // one row each, click -> the client's page. Replaces the empty Hello /
+  // Notifications boxes.
+  tenants: any[] = [];
+  tenantsLoading = false;
+  loadTenants() {
+    this.tenantsLoading = true;
+    this.tenantsService.getAllTenants().subscribe({
+      next: (res: any) => {
+        this.tenants = (res && res.Tenants ? res.Tenants : []).slice().sort((a: any, b: any) => {
+          const da = a.isDeleted ? 1 : 0, db = b.isDeleted ? 1 : 0;
+          if (da !== db) return da - db;
+          const aa = a.isActive ? 0 : 1, ab = b.isActive ? 0 : 1;
+          if (aa !== ab) return aa - ab;
+          return String(a.name || '').localeCompare(String(b.name || ''));
+        });
+        this.tenantsLoading = false;
+      },
+      error: () => { this.tenants = []; this.tenantsLoading = false; },
+    });
+  }
+  openClient(t: any) { this.router.navigateByUrl('/details/' + (t.id || t._id)); }
+  gb(bytes: any): string { const n = parseFloat(bytes); return (!n || isNaN(n)) ? '0' : (n / 1024 ** 3).toFixed(1); }
+  usersOf(t: any): number { return (Number(t.mobileUserCount) || 0) + (Number(t.webUserCount) || 0) + (Number(t.bothUserCount) || 0); }
+  isPast(d: any): boolean { const x = d ? new Date(d) : null; return !!(x && !isNaN(x.getTime()) && x.getTime() < Date.now()); }
+  get activeCount(): number { return this.tenants.filter(t => t.isActive && !t.isDeleted).length; }
+
   ngOnInit() {
+    this.loadTenants();
     // this.getCurrentHour();
     // this.getCurrentWeather();
     // this.checkTutorial();
