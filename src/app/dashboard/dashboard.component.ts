@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
   // Client FORM masters (blank fillable forms for ALL clients): the Final
   // Report Upon Completion (.docm, macros + dropdowns) and the Notice of
   // Unsafe Conditions (.docx). One master each, branded per-client on download.
-  // The FIVE master forms, in the order David wants them on the main page.
+  // The SIX master forms, in the order David wants them on the main page.
   // 'kind' decides which existing endpoint each slot posts to - the mappings
   // are unchanged, only the place they are presented.
   masterForms: { key: string; label: string; accept: string; kind: string; ext: string; note: string }[] = [
@@ -57,6 +57,11 @@ export class DashboardComponent implements OnInit {
       note: 'Generation master for on-site repairs inspections - project data, photos and PASS/FAIL are inserted automatically.' },
     { key: 'unsafeconditions', kind: 'clientform', label: 'Notice of Unsafe Conditions', accept: '.docx,.docm', ext: 'docx',
       note: 'Blank fillable form offered under every client\'s Reports tab.' },
+    // Review of Prior Inspection Report (David, Oct 6 2026): generation master
+    // for reviewing another company's report - pages 1-2 of the Visual report,
+    // the review sections and Annex 1. Same upload/download as the other masters.
+    { key: 'reviewmaster', kind: 'clientform', label: 'Review of Prior Inspection Report', accept: '.docx', ext: 'docx',
+      note: 'Generation master for the Review of Prior Inspection Report - keep every content control; answers and the prior report pages are inserted automatically.' },
   ];
 
   clientForms: { key: string; label: string; accept: string }[] = [
