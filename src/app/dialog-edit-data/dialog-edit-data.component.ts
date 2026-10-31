@@ -232,9 +232,9 @@ export class DialogEditDataComponent {
 
   async submitData() {
     this.isSaving = true;
-    // Sizes save FIRST and unconditionally: the icons flow below refuses to
-    // run unless all three images are present, and David expects "Ok" to keep
-    // whatever he typed in the size boxes (David, Aug 22).
+    // Sizes save FIRST and unconditionally: David expects "Ok" to keep
+    // whatever he typed in the size boxes even when no image is chosen
+    // (David, Aug 22).
     try {
       const body = this.sizesBody();
       await this.tenantsService.updateReportLogoSizes(this.data.id, body).toPromise();
@@ -281,55 +281,61 @@ export class DialogEditDataComponent {
 
     // console.log(iconsData, "Icond-data-before");
 
-    if((iconsData['logoUrl'] !== null || this.logoFile !== null) && (iconsData['footer'] !== null || this.footerFile !== null) && (iconsData['header'] !== null || this.headerFile !== null))
-      {
-        try {
-          if (this.footerFile) {
-            const response = await this.tenantsService
-              .uploadFile(dataFooter)
-              .toPromise();
-            iconsData['footer'] = response.url;
-          }
-    
-          if (this.headerFile) {
-            const response = await this.tenantsService
-              .uploadFile(dataHeader)
-              .toPromise();
-            iconsData['header'] = response.url;
-          }
-    
-          if (this.logoFile) {
-            const response = await this.tenantsService
-              .uploadFile(dataLogo)
-              .toPromise();
-            iconsData['logoUrl'] = response.url;
-          }
-    
-          // Call the API for updating or adding icons for a tenant
-            const apiResponse = await this.tenantsService
-              .upsertIcons(this.data.id, iconsData)
-              .toPromise();
-            console.log(apiResponse);
-    
-            this.isSaving = false;
-            this.dialogRef.close(); // Close the dialog after a successful update
-            this.toast.success('Files updated successfully!')
-            setTimeout(() => {
-              window.location.reload();
-            }, 1500);
-          
-        } catch (error) {
-          console.error('Error during file uploads or upsertIcons:', error);
-          this.isSaving = false;
-          this.toast.error('Failed to update or add icons for the tenant!');
-        }
-      } else {
-        // Images incomplete - that's fine, the sizes above are already saved.
-        this.toast.success('Sizes saved. (Images unchanged - upload all three to replace them.)');
-        this.isSaving = false;
-        this.dialogRef.close();
-        return;
+    // Oct 31 2026 (David): a new client with only ONE image chosen (e.g. just
+    // the website logo) used to fall into "Images unchanged" and nothing was
+    // saved - so the client had no logo on e3-web, proposals or reports.
+    // Now every image that was chosen is uploaded, and any slot still empty
+    // borrows the uploaded image (logo -> header -> footer order), so one logo
+    // file is enough to brand the website, proposals and reports.
+    if (!this.logoFile && !this.headerFile && !this.footerFile) {
+      this.toast.success('Sizes saved. (No new images chosen.)');
+      this.isSaving = false;
+      this.dialogRef.close();
+      return;
+    }
+
+    try {
+      if (this.footerFile) {
+        const response = await this.tenantsService.uploadFile(dataFooter).toPromise();
+        iconsData['footer'] = response.url;
       }
+      if (this.headerFile) {
+        const response = await this.tenantsService.uploadFile(dataHeader).toPromise();
+        iconsData['header'] = response.url;
+      }
+      if (this.logoFile) {
+        const response = await this.tenantsService.uploadFile(dataLogo).toPromise();
+        iconsData['logoUrl'] = response.url;
+      }
+
+      // Only real uploaded URLs are stored - never an in-browser preview.
+      const real = (u: any) => (typeof u === 'string' && /^https?:\/\//i.test(u)) ? u : null;
+      iconsData['logoUrl'] = real(iconsData['logoUrl']);
+      iconsData['header'] = real(iconsData['header']);
+      iconsData['footer'] = real(iconsData['footer']);
+      const filled: string[] = [];
+      if (!iconsData['logoUrl']) { iconsData['logoUrl'] = iconsData['header'] || iconsData['footer']; if (iconsData['logoUrl']) filled.push('website logo'); }
+      if (!iconsData['header']) { iconsData['header'] = iconsData['logoUrl'] || iconsData['footer']; if (iconsData['header']) filled.push('report header'); }
+      if (!iconsData['footer']) { iconsData['footer'] = iconsData['logoUrl'] || iconsData['header']; if (iconsData['footer']) filled.push('report footer'); }
+
+      const apiResponse = await this.tenantsService
+        .upsertIcons(this.data.id, iconsData)
+        .toPromise();
+      console.log(apiResponse);
+
+      this.isSaving = false;
+      this.dialogRef.close();
+      this.toast.success(filled.length
+        ? 'Logo saved. The same image was also used for: ' + filled.join(', ') + ' (replace any of them later if you like).'
+        : 'Files updated successfully!');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      console.error('Error during file uploads or upsertIcons:', error);
+      this.isSaving = false;
+      this.toast.error('Failed to update or add icons for the tenant!');
+    }
   }
 
   formValidator() {
