@@ -61,6 +61,11 @@ export class AppComponent implements OnInit {
     window.open('https://www.e3-web.com/apk', '_blank', 'noopener');
   }
 
+  // E3 Inspection Association members area (Oct 31 2026): app hub, training, setup guides, member-rate subscription.
+  openAssociation() {
+    window.open('https://www.e3-inspection-association.com/members-e3-app/', '_blank', 'noopener');
+  }
+
   logout() {
     localStorage.clear();
     this.router.navigateByUrl('/login');
