@@ -105,89 +105,9 @@
     </div>
   </ng-container>
 
-  <!-- ===== ACCOUNTS ===== -->
-  <div class="card">
-    <div class="card-head">
-      <h3>Client accounts <span class="count">{{ accounts.length }}</span></h3>
-      <div class="chips">
-        <span class="chip info">Trial {{ counts.trial }}</span>
-        <span class="chip ok">Subscribed {{ counts.active }}</span>
-        <span class="chip warn">Payment failed {{ counts.past_due }}</span>
-        <span class="chip bad">Locked {{ counts.locked }}</span>
-        <span class="chip ok">Complimentary {{ counts.complimentary }}</span>
-      </div>
-      <div class="tools">
-        <input class="search" placeholder="Search email or state" [(ngModel)]="filter">
-        <button mat-icon-button title="Refresh" (click)="loadAccounts()"><mat-icon>refresh</mat-icon></button>
-      </div>
-    </div>
-    <div class="loading" *ngIf="accountsLoading"><mat-icon>hourglass_empty</mat-icon> Loading accounts…</div>
-    <p class="muted" *ngIf="!accountsLoading && !accounts.length">No client has opened the portal since billing was switched on.</p>
-
-    <table class="bill accounts" *ngIf="shown.length">
-      <tr><th>Client login</th><th>State</th><th>Plan</th><th>Properties</th><th>Trial ends / next charge</th><th></th></tr>
-      <ng-container *ngFor="let a of shown">
-        <tr class="row" [class.open]="open === a.email" (click)="toggle(a)">
-          <td>{{ a.email }} <span class="chip mini" *ngIf="a.testMode">test</span></td>
-          <td><span class="chip" [ngClass]="stateClass(a)">{{ stateLabel(a) }}</span></td>
-          <td>{{ plan(a) }}</td>
-          <td>{{ a.quantity || '—' }}</td>
-          <td>{{ (a.currentPeriodEnd || a.trialEndsAt) ? ((a.currentPeriodEnd || a.trialEndsAt) | date:'MMM d, y') : '—' }}</td>
-          <td><mat-icon>{{ open === a.email ? 'expand_less' : 'expand_more' }}</mat-icon></td>
-        </tr>
-        <tr *ngIf="open === a.email" class="detail-row">
-          <td colspan="6">
-            <div class="loading" *ngIf="detailLoading"><mat-icon>hourglass_empty</mat-icon> Loading…</div>
-            <div class="detail" *ngIf="detail && !detailLoading">
-              <div class="kv-row">
-                <span>Properties now: <b>{{ detail.properties }}</b></span>
-                <span *ngIf="detail.pricing">Price: <b>{{ money(detail.pricing.monthlyCents) }}</b>/mo or <b>{{ money(detail.pricing.annualCents) }}</b>/yr per property<span *ngIf="detail.pricing.volumeApplied"> (incl. {{ detail.pricing.volumeApplied }}% volume discount)</span></span>
-                <span *ngIf="detail.status">Stripe status: <b>{{ detail.status }}</b></span>
-                <span *ngIf="detail.waived">Waived<span *ngIf="detail.waivedUntil"> until {{ detail.waivedUntil | date:'MMM d, y' }}</span><span *ngIf="detail.waivedNote">: {{ detail.waivedNote }}</span></span>
-              </div>
-
-              <div class="act-grid">
-                <div class="act">
-                  <h4>Waive fees (complimentary)</h4>
-                  <ng-container *ngIf="!detail.waived">
-                    <label>Note <input [(ngModel)]="waiveNote" maxlength="300" placeholder="e.g. pilot HOA"></label>
-                    <label>Until <small>blank = no end date</small><input type="date" [(ngModel)]="waiveUntil"></label>
-                    <button mat-stroked-button *ngIf="confirmAction !== 'waive'" (click)="confirmAction = 'waive'">Waive fees</button>
-                  </ng-container>
-                  <button mat-stroked-button color="warn" *ngIf="detail.waived && confirmAction !== 'unwaive'" (click)="confirmAction = 'unwaive'">Remove waiver</button>
-                </div>
-                <div class="act" *ngIf="!detail.status || detail.status === 'canceled' || detail.status === 'incomplete_expired'">
-                  <h4>Invoice billing</h4>
-                  <p class="muted small">Stripe emails an invoice instead of charging a card. For large clients.</p>
-                  <label>Plan <select [(ngModel)]="invoiceInterval"><option value="month">Monthly</option><option value="year">Yearly</option></select></label>
-                  <label>Days to pay <input type="number" min="1" max="90" [(ngModel)]="invoiceDays"></label>
-                  <button mat-stroked-button *ngIf="confirmAction !== 'invoice'" (click)="confirmAction = 'invoice'">Start invoice billing</button>
-                </div>
-                <div class="act">
-                  <h4>Properties</h4>
-                  <p class="muted small">Re-count this client's properties and update the subscription now (it also happens on its own every few hours).</p>
-                  <button mat-stroked-button [disabled]="busy" (click)="recount()">Recount properties</button>
-                </div>
-              </div>
-
-              <div class="confirm" *ngIf="confirmAction">
-                <span *ngIf="confirmAction === 'waive'">Waive all portal fees for {{ detail.email }}<span *ngIf="waiveUntil"> until {{ waiveUntil }}</span>?</span>
-                <span *ngIf="confirmAction === 'unwaive'">Remove the waiver? {{ detail.email }} will need a subscription again.</span>
-                <span *ngIf="confirmAction === 'invoice'">Start {{ invoiceInterval === 'year' ? 'yearly' : 'monthly' }} invoice billing for {{ detail.email }} ({{ detail.properties }} properties, due in {{ invoiceDays }} days)?</span>
-                <button mat-flat-button color="primary" [disabled]="busy" (click)="doAction()">{{ busy ? 'Working…' : 'Yes' }}</button>
-                <button mat-button [disabled]="busy" (click)="confirmAction = null">Cancel</button>
-              </div>
-
-              <details *ngIf="detail.log?.length">
-                <summary>History ({{ detail.log.length }})</summary>
-                <table class="log">
-                  <tr *ngFor="let l of detail.log.slice().reverse()"><td>{{ l.at | date:'MMM d, h:mm a' }}</td><td>{{ l.event }}</td><td>{{ l.by }}</td><td>{{ l.note }}</td></tr>
-                </table>
-              </details>
-            </div>
-          </td>
-        </tr>
-      </ng-container>
-    </table>
+  <!-- Nov 1 2026: client accounts moved to Portal Clients (one login per property owner, with its inspectors). -->
+  <div class="card moved">
+    <h3>Client accounts</h3>
+    <p class="muted">Each property owner's login, inspection companies, billing status, waivers and invoice billing are on <a routerLink="/portal-clients">Portal Clients</a>.</p>
   </div>
 </div>

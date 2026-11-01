@@ -9,8 +9,7 @@ import { PortalBillingService } from '../portal-billing.service';
  *   Settings - prices, intro, trial, yearly, volume discount. Nothing is saved until the
  *              admin reviews the list of changes and presses Confirm.
  *   Switches - billing on/off and "restart trials" (used once, after live Stripe keys are in).
- *   Accounts - every client portal login: state, plan, properties, next charge; per client:
- *              waive / remove waiver, recount properties, start invoice billing, history.
+ *   Client accounts moved to Portal Clients (Nov 1 2026).
  *
  * Prices are typed in DOLLARS here and sent to the server in CENTS.
  */
@@ -44,24 +43,10 @@ export class PortalBillingComponent implements OnInit {
   review: { patch: any; changes: Change[] } | null = null;
   confirmSwitch: 'on' | 'off' | 'restart' | null = null;
 
-  accounts: any[] = [];
-  accountsLoading = false;
-  filter = '';
-  open: string | null = null;           // email of the expanded row
-  detail: any = null;
-  detailLoading = false;
-  waiveNote = '';
-  waiveUntil = '';
-  invoiceInterval: 'month' | 'year' = 'month';
-  invoiceDays = 15;
-  confirmAction: 'waive' | 'unwaive' | 'invoice' | null = null;
-  busy = false;
-
   constructor(private api: PortalBillingService, private toast: HotToastService) {}
 
   ngOnInit(): void {
     this.load();
-    this.loadAccounts();
   }
 
   // ------------------------------------------------------------------ settings
@@ -166,87 +151,8 @@ export class PortalBillingComponent implements OnInit {
       next: (r) => {
         this.saving = false; this.confirmSwitch = null; this.apply(r);
         this.toast.success(which === 'restart' ? 'Trials restarted from today.' : which === 'on' ? 'Billing is ON.' : 'Billing is OFF. The portal is free for everyone.');
-        this.loadAccounts();
       },
       error: (e) => { this.saving = false; this.toast.error(this.err(e)); },
-    });
-  }
-
-  // ------------------------------------------------------------------ accounts
-  loadAccounts(): void {
-    this.accountsLoading = true;
-    this.api.accounts().subscribe({
-      next: (r) => { this.accounts = r.accounts || []; this.accountsLoading = false; },
-      error: (e) => { this.accountsLoading = false; this.toast.error(this.err(e)); },
-    });
-  }
-
-  get shown(): any[] {
-    const q = this.filter.trim().toLowerCase();
-    return q ? this.accounts.filter((a) => a.email.includes(q) || (a.state || '').includes(q)) : this.accounts;
-  }
-
-  get counts() {
-    const c: any = { trial: 0, active: 0, past_due: 0, locked: 0, complimentary: 0 };
-    this.accounts.forEach((a) => { if (c[a.state] !== undefined) c[a.state]++; });
-    return c;
-  }
-
-  stateLabel(a: any): string {
-    return ({ trial: 'Free trial', active: 'Subscribed', past_due: 'Payment failed', locked: 'Locked', complimentary: 'Complimentary', idle: 'No properties', off: 'Billing off' } as any)[a.state] || a.state;
-  }
-  stateClass(a: any): string {
-    return ({ active: 'ok', complimentary: 'ok', trial: 'info', past_due: 'warn', locked: 'bad' } as any)[a.state] || '';
-  }
-  plan(a: any): string {
-    if (!a.status) return '—';
-    const i = a.interval === 'year' ? 'Yearly' : a.interval === 'month' ? 'Monthly' : '';
-    return [i, a.collection === 'send_invoice' ? 'invoice' : 'card'].filter(Boolean).join(' · ');
-  }
-
-  toggle(a: any): void {
-    if (this.open === a.email) { this.open = null; this.detail = null; return; }
-    this.open = a.email; this.detail = null; this.confirmAction = null;
-    this.waiveNote = a.waivedNote || ''; this.waiveUntil = a.waivedUntil ? String(a.waivedUntil).slice(0, 10) : '';
-    this.loadDetail(a.email);
-  }
-
-  loadDetail(email: string): void {
-    this.detailLoading = true;
-    this.api.account(email).subscribe({
-      next: (r) => { this.detail = r.account; this.detailLoading = false; },
-      error: (e) => { this.detailLoading = false; this.toast.error(this.err(e)); },
-    });
-  }
-
-  private after(r: any, msg: string): void {
-    this.busy = false; this.confirmAction = null;
-    this.toast.success(msg);
-    const i = this.accounts.findIndex((x) => x.email === r.account.email);
-    if (i >= 0) this.accounts[i] = r.account;
-    this.loadDetail(r.account.email);
-  }
-
-  doAction(): void {
-    const email = this.open;
-    if (!email || !this.confirmAction) return;
-    this.busy = true;
-    const fail = (e: any) => { this.busy = false; this.toast.error(this.err(e)); };
-    if (this.confirmAction === 'waive') {
-      this.api.waive(email, true, this.waiveNote, this.waiveUntil || null).subscribe({ next: (r) => this.after(r, 'Fees waived.'), error: fail });
-    } else if (this.confirmAction === 'unwaive') {
-      this.api.waive(email, false, '', null).subscribe({ next: (r) => this.after(r, 'Waiver removed.'), error: fail });
-    } else {
-      this.api.invoice(email, this.invoiceInterval, this.invoiceDays).subscribe({ next: (r) => this.after(r, 'Invoice billing started. Stripe will email the invoice.'), error: fail });
-    }
-  }
-
-  recount(): void {
-    if (!this.open) return;
-    this.busy = true;
-    this.api.recount(this.open).subscribe({
-      next: (r) => this.after(r, 'Properties recounted.'),
-      error: (e) => { this.busy = false; this.toast.error(this.err(e)); },
     });
   }
 

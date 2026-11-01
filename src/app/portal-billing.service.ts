@@ -29,6 +29,10 @@ export class PortalBillingService {
     return this.http.post<any>(`${this.base}/waive`, { email, waived, note, until }, this.options);
   }
   recount(email: string): Observable<any> { return this.http.post<any>(`${this.base}/recount`, { email }, this.options); }
+  // Portal Clients (Nov 1 2026): every property-owner login with its inspectors and billing.
+  clients(): Observable<any> { return this.http.get<any>(`${this.base}/clients`, this.options); }
+  client(id: string): Observable<any> { return this.http.get<any>(`${this.base}/client?id=${encodeURIComponent(id)}`, this.options); }
+  setLogin(id: string, active: boolean): Observable<any> { return this.http.post<any>(`${this.base}/client/login`, { id, active }, this.options); }
   invoice(email: string, interval: 'month' | 'year', daysUntilDue: number): Observable<any> {
     return this.http.post<any>(`${this.base}/invoice`, { email, interval, daysUntilDue }, this.options);
   }

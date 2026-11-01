@@ -9,6 +9,7 @@ import { TenantDetailComponent } from './tenant-detail/tenant-detail.component';
 import { CustomFormsComponent } from './custom-forms/custom-forms.component';
 import { TenantUsersComponent } from './tenant-users/tenant-users.component';
 import { PortalBillingComponent } from './portal-billing/portal-billing.component';
+import { PortalClientsComponent } from './portal-clients/portal-clients.component';
 // import { InfoComponent } from './info/info.component';
 // import { NewsComponent } from './news/news.component';
 // import { LegalNoticeComponent } from './legal-notice/legal-notice.component';
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'details/:id', component: TenantDetailComponent },
   { path: 'tenant-users', component: TenantUsersComponent },
   { path: 'portal-billing', component: PortalBillingComponent },
+  { path: 'portal-clients', component: PortalClientsComponent },
   // { path: 'info', component: InfoComponent },
   // { path: 'news', component: NewsComponent },
   // { path: 'legal', component: LegalNoticeComponent },
