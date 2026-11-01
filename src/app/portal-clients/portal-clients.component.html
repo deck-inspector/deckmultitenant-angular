@@ -1,0 +1,137 @@
+<div class="pb-page">
+  <div class="pb-head">
+    <div>
+      <h1><mat-icon>person_pin</mat-icon> Portal Clients</h1>
+      <p class="muted">Property owners and managers who sign in to the client portal (www.e3-web.com). Each login is listed once, however many inspection companies share properties with it, and stays when an inspector ends the relationship.</p>
+    </div>
+    <a class="side-link" routerLink="/portal-billing"><mat-icon>payments</mat-icon> Prices &amp; billing settings</a>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="chips">
+        <button class="chip" [class.sel]="!stateFilter" (click)="stateFilter = ''">All {{ counts.all }}</button>
+        <button class="chip ok" [class.sel]="stateFilter === 'active'" (click)="stateFilter = 'active'">Subscribed {{ counts.active }}</button>
+        <button class="chip info" [class.sel]="stateFilter === 'trial'" (click)="stateFilter = 'trial'">Free trial {{ counts.trial }}</button>
+        <button class="chip warn" [class.sel]="stateFilter === 'past_due'" (click)="stateFilter = 'past_due'">Payment failed {{ counts.past_due }}</button>
+        <button class="chip bad" [class.sel]="stateFilter === 'locked'" (click)="stateFilter = 'locked'">Locked {{ counts.locked }}</button>
+        <button class="chip ok" [class.sel]="stateFilter === 'complimentary'" (click)="stateFilter = 'complimentary'">Complimentary {{ counts.complimentary }}</button>
+        <button class="chip warn" [class.sel]="stateFilter === 'no-inspector'" (click)="stateFilter = 'no-inspector'">No active inspector {{ counts['no-inspector'] }}</button>
+        <button class="chip bad" [class.sel]="stateFilter === 'login-off'" (click)="stateFilter = 'login-off'">Login off {{ counts['login-off'] }}</button>
+      </div>
+      <div class="tools">
+        <select class="search" [(ngModel)]="inspectorFilter" title="Inspection company">
+          <option value="">All inspectors</option>
+          <option *ngFor="let i of inspectors" [value]="i">{{ i }}</option>
+        </select>
+        <input class="search" placeholder="Search name, email, inspector" [(ngModel)]="search">
+        <button mat-icon-button title="Refresh" (click)="load()"><mat-icon>refresh</mat-icon></button>
+      </div>
+    </div>
+
+    <div class="loading" *ngIf="loading"><mat-icon>hourglass_empty</mat-icon> Loading portal clients…</div>
+    <p class="error-text" *ngIf="loadError">Could not load portal clients. {{ loadError }}</p>
+    <p class="muted" *ngIf="!loading && !loadError && !shown.length">{{ clients.length ? 'No portal client matches.' : 'No property owner has a portal login yet.' }}</p>
+
+    <table class="bill accounts" *ngIf="shown.length">
+      <tr><th>Portal client</th><th>Inspection companies</th><th>Properties</th><th>Status</th><th>Plan / next date</th><th></th></tr>
+      <ng-container *ngFor="let c of shown">
+        <tr class="row" [class.open]="open === c.id" (click)="toggle(c)">
+          <td><b>{{ c.name || c.email || c.formerUsername || c.username }}</b><div class="sub">{{ c.email || '(no email)' }}</div></td>
+          <td>
+            <div class="chips">
+              <span *ngFor="let i of c.inspectors" class="chip" [class.ok]="i.active" [class.ended]="!i.active" [title]="(i.primary ? 'First inspector' : 'Linked') + (i.active ? '' : ' - ended')">{{ i.inspector }}<span *ngIf="!i.active"> · ended</span></span>
+            </div>
+          </td>
+          <td>{{ c.properties ?? '—' }}</td>
+          <td><span class="chip" [ngClass]="cls(state(c))">{{ label(state(c)) }}</span> <span class="chip mini" *ngIf="c.billing?.testMode">test</span></td>
+          <td><span>{{ plan(c.billing) }}</span><div class="sub" *ngIf="nextDate(c.billing)">{{ nextDate(c.billing) | date:'MMM d, y' }}</div></td>
+          <td><mat-icon>{{ open === c.id ? 'expand_less' : 'expand_more' }}</mat-icon></td>
+        </tr>
+        <tr *ngIf="open === c.id" class="detail-row">
+          <td colspan="6">
+            <div class="loading" *ngIf="detailLoading && !detail"><mat-icon>hourglass_empty</mat-icon> Loading…</div>
+            <div class="detail" *ngIf="detail">
+              <div class="kv-row">
+                <span>Login: <b>{{ detail.username }}</b></span>
+                <span *ngIf="detail.mobile">Phone: <b>{{ detail.mobile }}</b></span>
+                <span *ngIf="detail.createdAt">Portal client since <b>{{ detail.createdAt | date:'MMM d, y' }}</b></span>
+                <span *ngIf="!detail.loginOn" class="bad-text">Login turned off<span *ngIf="detail.adminDisabledAt"> {{ detail.adminDisabledAt | date:'MMM d, y' }} by {{ detail.adminDisabledBy }}</span></span>
+              </div>
+
+              <h4>Inspection companies</h4>
+              <table class="bill small-table">
+                <tr><th>Inspector</th><th>Client record</th><th>Since</th><th>Status</th><th>Properties</th></tr>
+                <tr *ngFor="let i of detail.inspectors">
+                  <td>{{ i.inspector }} <span class="chip mini" *ngIf="i.primary">first</span></td>
+                  <td>{{ i.clientName || '—' }}</td>
+                  <td>{{ i.since ? (i.since | date:'MMM d, y') : '—' }}</td>
+                  <td><span class="chip" [class.ok]="i.active" [class.ended]="!i.active">{{ i.active ? 'Active' : 'Ended' }}</span><span class="sub" *ngIf="!i.active && i.changedAt"> {{ i.changedAt | date:'MMM d, y' }}</span></td>
+                  <td>{{ i.active ? (i.properties ?? '—') : '—' }}</td>
+                </tr>
+              </table>
+              <p class="muted small" *ngIf="!detail.activeInspectors && detail.loginOn">No inspector is sharing properties right now. The login is kept; when an inspector invites this email again, the owner signs in with the same password.</p>
+
+              <h4>Billing</h4>
+              <div class="kv-row" *ngIf="detail.billing as b">
+                <span>Status: <span class="chip" [ngClass]="cls(b.state)">{{ label(b.state) }}</span></span>
+                <span *ngIf="b.status">Plan: <b>{{ plan(b) }}</b> · Stripe <b>{{ b.status }}</b></span>
+                <span *ngIf="nextDate(b)">{{ b.status ? 'Next charge' : 'Trial ends' }}: <b>{{ nextDate(b) | date:'MMM d, y' }}</b></span>
+                <span *ngIf="b.pricing">Price: <b>{{ money(b.pricing.monthlyCents) }}</b>/mo or <b>{{ money(b.pricing.annualCents) }}</b>/yr per property<span *ngIf="b.pricing.volumeApplied"> (incl. {{ b.pricing.volumeApplied }}% volume discount)</span></span>
+                <span *ngIf="b.waived">Waived<span *ngIf="b.waivedUntil"> until {{ b.waivedUntil | date:'MMM d, y' }}</span><span *ngIf="b.waivedNote">: {{ b.waivedNote }}</span></span>
+              </div>
+
+              <div class="act-grid">
+                <div class="act" *ngIf="canBill">
+                  <h4>Waive fees (complimentary)</h4>
+                  <ng-container *ngIf="!detail.billing?.waived">
+                    <label>Note <input [(ngModel)]="waiveNote" maxlength="300" placeholder="e.g. pilot HOA"></label>
+                    <label>Until <small>blank = no end date</small><input type="date" [(ngModel)]="waiveUntil"></label>
+                    <button mat-stroked-button *ngIf="confirmAction !== 'waive'" (click)="confirmAction = 'waive'">Waive fees</button>
+                  </ng-container>
+                  <button mat-stroked-button color="warn" *ngIf="detail.billing?.waived && confirmAction !== 'unwaive'" (click)="confirmAction = 'unwaive'">Remove waiver</button>
+                </div>
+                <div class="act" *ngIf="canInvoice">
+                  <h4>Invoice billing</h4>
+                  <p class="muted small">Stripe emails an invoice instead of charging a card. For large clients.</p>
+                  <label>Plan <select [(ngModel)]="invoiceInterval"><option value="month">Monthly</option><option value="year">Yearly</option></select></label>
+                  <label>Days to pay <input type="number" min="1" max="90" [(ngModel)]="invoiceDays"></label>
+                  <button mat-stroked-button *ngIf="confirmAction !== 'invoice'" (click)="confirmAction = 'invoice'">Start invoice billing</button>
+                </div>
+                <div class="act" *ngIf="canBill && detail.billing?.status">
+                  <h4>Properties</h4>
+                  <p class="muted small">Re-count properties and update the subscription now (it also happens on its own every few hours).</p>
+                  <button mat-stroked-button [disabled]="busy" (click)="recount()">Recount properties</button>
+                </div>
+                <div class="act">
+                  <h4>Portal login</h4>
+                  <p class="muted small" *ngIf="detail.loginOn">Turning the login off stops access to every inspector's properties. Inspectors can only end their own access.</p>
+                  <p class="muted small" *ngIf="!detail.loginOn">The owner cannot sign in. Their email, billing record and inspectors are kept.</p>
+                  <button mat-stroked-button color="warn" *ngIf="detail.loginOn && confirmAction !== 'login-off'" (click)="confirmAction = 'login-off'">Turn login off</button>
+                  <button mat-stroked-button color="primary" *ngIf="!detail.loginOn && confirmAction !== 'login-on'" (click)="confirmAction = 'login-on'">Turn login on</button>
+                </div>
+              </div>
+
+              <div class="confirm" *ngIf="confirmAction">
+                <span *ngIf="confirmAction === 'waive'">Waive all portal fees for {{ detail.email }}<span *ngIf="waiveUntil"> until {{ waiveUntil }}</span>?</span>
+                <span *ngIf="confirmAction === 'unwaive'">Remove the waiver? {{ detail.email }} will need a subscription again.</span>
+                <span *ngIf="confirmAction === 'invoice'">Start {{ invoiceInterval === 'year' ? 'yearly' : 'monthly' }} invoice billing for {{ detail.email }} ({{ detail.properties }} properties, due in {{ invoiceDays }} days)?</span>
+                <span *ngIf="confirmAction === 'login-off'">Turn off {{ detail.email }}'s portal login? They lose access to every inspector's properties until you turn it back on.</span>
+                <span *ngIf="confirmAction === 'login-on'">Turn {{ detail.email }}'s portal login back on?</span>
+                <button mat-flat-button color="primary" [disabled]="busy" (click)="doAction()">{{ busy ? 'Working…' : 'Yes' }}</button>
+                <button mat-button [disabled]="busy" (click)="confirmAction = null">Cancel</button>
+              </div>
+
+              <details *ngIf="detail.billing?.log?.length">
+                <summary>Billing history ({{ detail.billing.log.length }})</summary>
+                <table class="log">
+                  <tr *ngFor="let l of detail.billing.log.slice().reverse()"><td>{{ l.at | date:'MMM d, h:mm a' }}</td><td>{{ l.event }}</td><td>{{ l.by }}</td><td>{{ l.note }}</td></tr>
+                </table>
+              </details>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </table>
+  </div>
+</div>
