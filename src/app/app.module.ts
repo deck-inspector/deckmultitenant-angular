@@ -80,6 +80,7 @@ import { DialogEditCustomFormComponent } from './dialog-edit-custom-form/dialog-
 import { TenantUsersComponent } from './tenant-users/tenant-users.component';
 import { PortalBillingComponent } from './portal-billing/portal-billing.component';
 import { PortalClientsComponent } from './portal-clients/portal-clients.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 @NgModule({
   declarations: [
@@ -116,6 +117,7 @@ import { PortalClientsComponent } from './portal-clients/portal-clients.componen
     TenantUsersComponent,
     PortalBillingComponent,
     PortalClientsComponent,
+    ChangePasswordComponent,
   ],
   imports: [
     BrowserModule,

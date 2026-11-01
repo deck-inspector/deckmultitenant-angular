@@ -56,6 +56,7 @@
           <div class="color-dot"></div>
           <div class="userinfo-wrapper" *ngIf="userMenuOpen">
             <h2>{{ storedUsername }}</h2>
+            <div [routerLink]="['/change-password']" (click)="userMenuOpen = false"><mat-icon>lock</mat-icon>Change password</div>
             <div (click)="logout()"><mat-icon>logout</mat-icon>Logout</div>
           </div>
         </div>
