@@ -79,11 +79,13 @@
                 <span *ngIf="nextDate(b)">{{ b.status ? 'Next charge' : 'Trial ends' }}: <b>{{ nextDate(b) | date:'MMM d, y' }}</b></span>
                 <span *ngIf="b.pricing">Price: <b>{{ money(b.pricing.monthlyCents) }}</b>/mo or <b>{{ money(b.pricing.annualCents) }}</b>/yr per property<span *ngIf="b.pricing.volumeApplied"> (incl. {{ b.pricing.volumeApplied }}% volume discount)</span></span>
                 <span *ngIf="b.waived">Waived<span *ngIf="b.waivedUntil"> until {{ b.waivedUntil | date:'MMM d, y' }}</span><span *ngIf="b.waivedNote">: {{ b.waivedNote }}</span></span>
+                <span *ngIf="b.stripePaused" class="chip warn">Stripe charging paused<span *ngIf="b.stripeResumesAt"> until {{ b.stripeResumesAt | date:'MMM d, y' }}</span></span>
               </div>
 
               <div class="act-grid">
                 <div class="act" *ngIf="canBill">
                   <h4>Waive fees (complimentary)</h4>
+                  <p class="muted small" *ngIf="detail.billing?.status && !detail.billing?.waived">If they already pay by card, Stripe stops charging while fees are waived (and starts again on the end date).</p>
                   <ng-container *ngIf="!detail.billing?.waived">
                     <label>Note <input [(ngModel)]="waiveNote" maxlength="300" placeholder="e.g. pilot HOA"></label>
                     <label>Until <small>blank = no end date</small><input type="date" [(ngModel)]="waiveUntil"></label>
