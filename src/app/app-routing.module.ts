@@ -8,6 +8,7 @@ import { ExpensesComponent } from './expenses/expenses.component';
 import { TenantDetailComponent } from './tenant-detail/tenant-detail.component';
 import { CustomFormsComponent } from './custom-forms/custom-forms.component';
 import { TenantUsersComponent } from './tenant-users/tenant-users.component';
+import { PortalBillingComponent } from './portal-billing/portal-billing.component';
 // import { InfoComponent } from './info/info.component';
 // import { NewsComponent } from './news/news.component';
 // import { LegalNoticeComponent } from './legal-notice/legal-notice.component';
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'details/:id', component: TenantDetailComponent },
   { path: 'tenant-users', component: TenantUsersComponent },
+  { path: 'portal-billing', component: PortalBillingComponent },
   // { path: 'info', component: InfoComponent },
   // { path: 'news', component: NewsComponent },
   // { path: 'legal', component: LegalNoticeComponent },

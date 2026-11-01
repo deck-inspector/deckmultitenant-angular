@@ -78,6 +78,7 @@ import { CustomFormsComponent } from './custom-forms/custom-forms.component';
 import { DialogAddFormComponent } from './dialog-add-form/dialog-add-form.component';
 import { DialogEditCustomFormComponent } from './dialog-edit-custom-form/dialog-edit-custom-form.component';
 import { TenantUsersComponent } from './tenant-users/tenant-users.component';
+import { PortalBillingComponent } from './portal-billing/portal-billing.component';
 
 @NgModule({
   declarations: [
@@ -112,6 +113,7 @@ import { TenantUsersComponent } from './tenant-users/tenant-users.component';
     DialogAddFormComponent,
     DialogEditCustomFormComponent,
     TenantUsersComponent,
+    PortalBillingComponent,
   ],
   imports: [
     BrowserModule,
